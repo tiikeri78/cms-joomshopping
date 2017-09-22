@@ -3,6 +3,7 @@
 namespace YaMoney\Client;
 
 
+use Psr\Log\LoggerInterface;
 use YaMoney\Common\Exceptions\ApiConnectionException;
 use YaMoney\Common\Exceptions\AuthorizeException;
 use YaMoney\Common\ResponseObject;
@@ -49,10 +50,37 @@ class StreamClient implements ApiClientInterface
     public $responseBody;
 
     /**
+     * @var LoggerInterface|null
+     */
+    private $logger;
+
+    /**
+     * @param LoggerInterface|null $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * @inheritdoc
      */
     public function call($path, $method, $queryParams, $httpBody = null, $headers = array())
     {
+        if ($this->logger !== null) {
+            $message = 'Send request: ' . $method . ' ' . $path;
+            if (!empty($queryParams)) {
+                $message .= ' with query params: ' . json_encode($queryParams);
+            }
+            if (!empty($httpBody)) {
+                $message .= ' with body: ' . $httpBody;
+            }
+            if (!empty($httpBody)) {
+                $message .= ' with headers: ' . json_encode($headers);
+            }
+            $this->logger->info($message);
+        }
+
         $url = $this->getUrl() . $path;
 
         $options = array(
@@ -75,6 +103,15 @@ class StreamClient implements ApiClientInterface
                 return explode(':', $header);
             }, $this->responseHeaders);
             $httpBody = $this->responseBody;
+
+            if ($this->logger !== null) {
+                $message = 'Response with code 200 received with headers: '
+                    . json_encode($httpHeaders);
+                if (!empty($httpBody)) {
+                    $message .= ' and body: ' . $httpBody;
+                }
+                $this->logger->info($message);
+            }
 
             return new ResponseObject(array(
                 'headers' => $httpHeaders,

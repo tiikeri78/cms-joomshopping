@@ -91,8 +91,8 @@ class pm_yandex_money extends PaymentRoot
                 return false;
             } else {
                 $paymentType = $params['payment_type'];
-                if (!empty($paymentType) && $pmConfigs['paymode'] != '1') {
-                    return false;
+                if (empty($paymentType) && $pmConfigs['paymode'] == '1') {
+                    return true;
                 } else {
                     return \YaMoney\Model\PaymentMethodType::valueExists($paymentType);
                 }
@@ -160,15 +160,6 @@ class pm_yandex_money extends PaymentRoot
         return true;
     }
 
-    public function sendCode($callbackParams, $code)
-    {
-        header("Content-type: text/xml; charset=utf-8");
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>
-            <'.$callbackParams['action'].'Response performedDatetime="'.date("c").'" code="'.$code
-            .'" invoiceId="'.$callbackParams['invoiceId'].'" shopId="'.$this->ym_shopid.'"/>';
-        echo $xml;
-    }
-
     function checkTransaction($pmConfigs, $order, $act)
     {
         $this->mode = $this->getMode($pmConfigs);
@@ -220,7 +211,7 @@ class pm_yandex_money extends PaymentRoot
 
     function showEndForm($pmConfigs, $order)
     {
-        $this->ym_test_mode = $pmConfigs['testmode'];
+        $this->ym_test_mode = isset($pmConfigs['testmode']) ? $pmConfigs['testmode'] : false;
         $this->mode = $this->getMode($pmConfigs);
         if ($this->mode === self::MODE_KASSA) {
             $this->processKassaPayment($pmConfigs, $order);
@@ -333,11 +324,10 @@ class pm_yandex_money extends PaymentRoot
             $request->getReceipt()->normalize($request->getAmount());
         }
 
-        $client = new \YaMoney\Client\YandexMoneyApi();
-        $client->setAuth($pmConfigs['shop_id'], $pmConfigs['shop_password']);
         $tries = 0;
+        $key = $order->order_id . '-' . microtime(true);
         do {
-            $payment = $client->createPayment($request);
+            $payment = $this->getApiClient($pmConfigs)->createPayment($request, $key);
             if ($payment === null) {
                 $tries++;
                 if ($tries > 3) {
@@ -484,11 +474,14 @@ class pm_yandex_money extends PaymentRoot
         return $this->getApiClient($pmConfigs)->getPaymentInfo($paymentId);
     }
 
+    private $client;
+
     private function getApiClient($pmConfigs)
     {
         if ($this->client === null) {
             $this->client = new \YaMoney\Client\YandexMoneyApi();
             $this->client->setAuth($pmConfigs['shop_id'], $pmConfigs['shop_password']);
+            $this->client->setLogger($this);
         }
         return $this->client;
     }
@@ -543,7 +536,7 @@ class pm_yandex_money extends PaymentRoot
     private function finishOrder($order, $endStatus)
     {
         $act = 'finish';
-        $payment_method = 'pm_yandexmoney';
+        $payment_method = 'pm_yandex_money';
         $no_lang = '1';
 
         if ($this->joomlaVersion === 2) {
@@ -598,6 +591,18 @@ class pm_yandex_money extends PaymentRoot
                 $checkout->paymentComplete($order_id, $text);
             }
             $checkout->clearAllDataCheckout();
+        }
+    }
+
+    public function log($level, $message, $context = array())
+    {
+        $fileName = realpath(dirname(__FILE__) . DS . '..' . DS . '..') . DS . 'log' . DS . 'pm_yandex_money.log';
+        $fd = @fopen($fileName, 'a');
+        if ($fd) {
+            flock($fd, LOCK_EX);
+            fwrite($fd, date(DATE_ATOM) . ' [' . $level . '] ' . $message . "\r\n");
+            flock($fd, LOCK_UN);
+            fclose($fd);
         }
     }
 }

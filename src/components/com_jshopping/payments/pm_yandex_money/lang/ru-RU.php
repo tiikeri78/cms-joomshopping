@@ -26,9 +26,10 @@ define('_JSHOP_YM_KASSA_HELP_SUCCESSURL', 'Включите «Использов
 define('_JSHOP_YM_KASSA_HELP_DYNAMICURL', 'Страницы с динамическими адресами');
 
 define('_JSHOP_YM_KASSA_HEAD_LK', 'Параметры из личного кабинета Яндекс.Кассы');
-define('_JSHOP_YM_KASSA_SHOPID', 'Скопируйте shopId из личного кабинета Яндекс.Кассы');
-define('_JSHOP_YM_KASSA_SCID', 'Номер витрины магазина');
-define('_JSHOP_YM_KASSA_PSW', 'Выпустите и активируйте секретный ключ в личном кабинете Яндекс.Кассы. Потом скопируйте его сюда.');
+define('_JSHOP_YM_KASSA_SHOP_ID_LABEL', 'shopId');
+define('_JSHOP_YM_KASSA_SHOP_ID_DESCRIPTION', 'Скопируйте shopId из личного кабинета Яндекс.Кассы');
+define('_JSHOP_YM_KASSA_PASSWORD_LABEL', 'Секретный ключ');
+define('_JSHOP_YM_KASSA_PASSWORD_DESCRIPTION', 'Выпустите и активируйте секретный ключ в личном кабинете Яндекс.Кассы. Потом скопируйте его сюда.');
 define('_JSHOP_YM_KASSA_PARAMS', 'Shop ID, scid, ShopPassword можно посмотреть в <a href=\'https://money.yandex.ru/joinups\' target=\'_blank\'>личном кабинете</a> после подключения Яндекс.Кассы.');
 
 define('_JSHOP_YM_KASSA_PAYMODE_HEAD', 'Настройка сценария оплаты');
@@ -39,6 +40,7 @@ define('_JSHOP_YM_KASSA_PAYMODE_SHOP', 'На стороне магазина');
 define('_JSHOP_YM_KASSA_PAYMODE_LINK', '<a href=\'https://tech.yandex.ru/money/doc/payment-solution/payment-form/payment-form-docpage/\' target=\'_blank\'>Подробнее о сценариях оплаты</a>');
 define('_JSHOP_YM_KASSA_SELECT_TEXT', 'Отметьте способы оплаты, которые указаны в вашем договоре с Яндекс.Деньгами');
 define('_JSHOP_YM_METHOD_YM_DESCRIPTION', 'Яндекс.Деньги');
+define('_JSHOP_YM_METHOD_CARDS_DESCRIPTION', 'Банковские карты');
 define('_JSHOP_YM_METHOD_BANK_CARD_DESCRIPTION', 'Банковские карты');
 define('_JSHOP_YM_METHOD_CASH_DESCRIPTION', 'Наличные через терминалы');
 define('_JSHOP_YM_METHOD_MOBILE_BALANCE_DESCRIPTION', 'Баланс мобильного');

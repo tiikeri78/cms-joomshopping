@@ -2,12 +2,15 @@
 
 namespace YaMoney\Client;
 
+use Psr\Log\LoggerInterface;
+use YaMoney\Common\Exceptions\ApiException;
 use YaMoney\Common\Exceptions\BadApiRequestException;
 use YaMoney\Common\Exceptions\ForbiddenException;
 use YaMoney\Common\Exceptions\JsonException;
 use YaMoney\Common\Exceptions\InternalServerError;
 use YaMoney\Common\Exceptions\UnauthorizedException;
 use YaMoney\Common\HttpVerb;
+use YaMoney\Common\LoggerWrapper;
 use YaMoney\Common\ResponseObject;
 use YaMoney\Helpers\Config\ConfigurationLoader;
 use YaMoney\Helpers\Config\ConfigurationLoaderInterface;
@@ -35,6 +38,8 @@ use YaMoney\Request\Refunds\RefundsResponse;
 
 class YandexMoneyApi
 {
+    const IDEMPOTENCY_KEY_HEADER = 'Idempotence-Key';
+
     /**
      * @var null|ApiClientInterface
      */
@@ -54,6 +59,11 @@ class YandexMoneyApi
      * @var array
      */
     private $config;
+
+    /**
+     * @var LoggerInterface|null
+     */
+    private $logger;
 
     /**
      * Constructor
@@ -112,8 +122,25 @@ class YandexMoneyApi
     {
         $this->apiClient = $apiClient;
         $this->apiClient->setConfig($this->config);
+        $this->apiClient->setLogger($this->logger);
 
         return $this;
+    }
+
+    /**
+     * Устанавливает логгер приложения
+     * @param null|callable|object|LoggerInterface $value Инстанс логгера
+     */
+    public function setLogger($value)
+    {
+        if ($value === null || $value instanceof LoggerInterface) {
+            $this->logger = $value;
+        } else {
+            $this->logger = new LoggerWrapper($value);
+        }
+        if ($this->apiClient !== null) {
+            $this->apiClient->setLogger($this->logger);
+        }
     }
 
     /**
@@ -136,12 +163,14 @@ class YandexMoneyApi
 
         $response = $this->apiClient->call($path, HttpVerb::GET, $queryParams);
 
+        $result = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-            return new PaymentOptionsResponse($result);
+            $responseArray = json_decode($response->getBody(), true);
+            $result = new PaymentOptionsResponse($responseArray);
         } else {
             $this->handleError($response);
         }
+        return $result;
     }
 
     /**
@@ -162,21 +191,21 @@ class YandexMoneyApi
         }
 
         $response = $this->apiClient->call($path, HttpVerb::GET, $queryParams);
+        $paymentResponse = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-            $paymentResponse = new PaymentsResponse($result);
-
-            return $paymentResponse;
+            $responseArray = json_decode($response->getBody(), true);
+            $paymentResponse = new PaymentsResponse($responseArray);
         } else {
             $this->handleError($response);
         }
+        return $paymentResponse;
     }
 
     /**
      * Проведение оплаты.
      *
      * @param CreatePaymentRequestInterface $payment
-     * @param null $idempotenceKey
+     * @param null $idempotencyKey
      *
      * @return CreatePaymentResponse
      * @throws BadApiRequestException
@@ -184,14 +213,14 @@ class YandexMoneyApi
      * @throws InternalServerError
      * @throws UnauthorizedException
      */
-    public function createPayment(CreatePaymentRequestInterface $payment, $idempotenceKey = null)
+    public function createPayment(CreatePaymentRequestInterface $payment, $idempotencyKey = null)
     {
         $path = '/payments';
 
         $headers = array();
 
-        if ($idempotenceKey) {
-            $headers['Idempotence-Key'] = $idempotenceKey;
+        if ($idempotencyKey) {
+            $headers[self::IDEMPOTENCY_KEY_HEADER] = $idempotencyKey;
         }
 
         $serializer = new CreatePaymentRequestSerializer();
@@ -199,14 +228,14 @@ class YandexMoneyApi
         $httpBody = $this->encodeData($serializedData);
 
         $response = $this->apiClient->call($path, HttpVerb::POST, null, $httpBody, $headers);
+        $paymentResponse = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-            $paymentResponse = new CreatePaymentResponse($result);
-
-            return $paymentResponse;
+            $resultArray = json_decode($response->getBody(), true);
+            $paymentResponse = new CreatePaymentResponse($resultArray);
         } else {
             $this->handleError($response);
         }
+        return $paymentResponse;
     }
 
     /**
@@ -223,23 +252,24 @@ class YandexMoneyApi
         $path = '/payments/' . $paymentId;
 
         $response = $this->apiClient->call($path, HttpVerb::GET, null);
-	    if ($response->getCode() == 200) {
-		    $result = json_decode($response->getBody(), true);
-
-		    return new PaymentResponse($result);
-	    } else {
-		    $this->handleError($response);
-	    }
+        $result = null;
+        if ($response->getCode() == 200) {
+            $resultArray = json_decode($response->getBody(), true);
+            $result = new PaymentResponse($resultArray);
+        } else {
+            $this->handleError($response);
+        }
+        return $result;
     }
 
     /**
      * Подтвердить оплату.
      * @param CreateCaptureRequestInterface $captureRequest
      * @param $paymentId
-     * @param null $idempotenceKey
+     * @param null $idempotencyKey
      * @return CreateCaptureResponse
      */
-    public function capturePayment(CreateCaptureRequestInterface $captureRequest, $paymentId, $idempotenceKey = null)
+    public function capturePayment(CreateCaptureRequestInterface $captureRequest, $paymentId, $idempotencyKey = null)
     {
         if ($paymentId === null) {
             throw new \InvalidArgumentException('Missing the required parameter $paymentId');
@@ -249,8 +279,8 @@ class YandexMoneyApi
 
         $headers = array();
 
-        if ($idempotenceKey) {
-            $headers['Idempotence-Key'] = $idempotenceKey;
+        if ($idempotencyKey) {
+            $headers[self::IDEMPOTENCY_KEY_HEADER] = $idempotencyKey;
         }
 
         $serializer = new CreateCaptureRequestSerializer();
@@ -258,22 +288,23 @@ class YandexMoneyApi
         $httpBody = $this->encodeData($serializedData);
         $response = $this->apiClient->call($path, HttpVerb::POST, null, $httpBody, $headers);
 
+        $result = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-
-            return new CreateCaptureResponse($result);
+            $resultArray = json_decode($response->getBody(), true);
+            $result = new CreateCaptureResponse($resultArray);
         } else {
             $this->handleError($response);
         }
+        return $result;
     }
 
     /**
      * Отменить незавершенную оплату заказа.
      * @param $paymentId
-     * @param null $idempotenceKey
+     * @param null $idempotencyKey
      * @return CancelResponse
      */
-    public function cancelPayment($paymentId, $idempotenceKey = null)
+    public function cancelPayment($paymentId, $idempotencyKey = null)
     {
         if ($paymentId === null) {
             throw new \InvalidArgumentException('Missing the required parameter $paymentId');
@@ -283,19 +314,20 @@ class YandexMoneyApi
 
         $headers = array();
 
-        if ($idempotenceKey) {
-            $headers['Idempotence-Key'] = $idempotenceKey;
+        if ($idempotencyKey) {
+            $headers[self::IDEMPOTENCY_KEY_HEADER] = $idempotencyKey;
         }
 
         $response = $this->apiClient->call($path, HttpVerb::POST, null, null, $headers);
 
+        $result = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-
-            return new CancelResponse($result);
+            $resultArray = json_decode($response->getBody(), true);
+            $result = new CancelResponse($resultArray);
         } else {
             $this->handleError($response);
         }
+        return $result;
     }
 
     /**
@@ -317,31 +349,30 @@ class YandexMoneyApi
         }
 
         $response = $this->apiClient->call($path, HttpVerb::GET, $queryParams);
-
+        $refundsResponse = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-            $refundsResponse = new RefundsResponse($result);
-
-            return $refundsResponse;
+            $resultArray = json_decode($response->getBody(), true);
+            $refundsResponse = new RefundsResponse($resultArray);
         } else {
             $this->handleError($response);
         }
+        return $refundsResponse;
     }
 
     /**
      * Проведение возврата платежа
      * @param CreateRefundRequestInterface $refundsRequest
-     * @param null $idempotenceKey
+     * @param null $idempotencyKey
      * @return CreateRefundResponse
      */
-    public function createRefund(CreateRefundRequestInterface $refundsRequest, $idempotenceKey = null)
+    public function createRefund(CreateRefundRequestInterface $refundsRequest, $idempotencyKey = null)
     {
         $path = '/refunds';
 
         $headers = array();
 
-        if ($idempotenceKey) {
-            $headers['Idempotence-Key'] = $idempotenceKey;
+        if ($idempotencyKey) {
+            $headers[self::IDEMPOTENCY_KEY_HEADER] = $idempotencyKey;
         }
 
         $serializer = new CreateRefundRequestSerializer();
@@ -349,13 +380,14 @@ class YandexMoneyApi
         $httpBody = $this->encodeData($serializedData);
         $response = $this->apiClient->call($path, HttpVerb::POST, null, $httpBody, $headers);
 
+        $result = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-
-            return new CreateRefundResponse($result);
+            $resultArray = json_decode($response->getBody(), true);
+            $result = new CreateRefundResponse($resultArray);
         } else {
             $this->handleError($response);
         }
+        return $result;
     }
 
     /**
@@ -372,13 +404,14 @@ class YandexMoneyApi
         $path = '/refunds/' . $refundId;
         $response = $this->apiClient->call($path, HttpVerb::GET, null);
 
+        $result = null;
         if ($response->getCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-
-            return new RefundResponse($result);
+            $resultArray = json_decode($response->getBody(), true);
+            $result = new RefundResponse($resultArray);
         } else {
             $this->handleError($response);
         }
+        return $result;
     }
 
     /**
@@ -419,6 +452,7 @@ class YandexMoneyApi
      * @throws ForbiddenException
      * @throws InternalServerError
      * @throws UnauthorizedException
+     * @throws ApiException
      */
     private function handleError(ResponseObject $response)
     {
@@ -435,6 +469,15 @@ class YandexMoneyApi
             case InternalServerError::HTTP_CODE:
                 throw new InternalServerError($response->getHeaders(), $response->getBody());
                 break;
+            default:
+                if ($response->getCode() > 399) {
+                    throw new ApiException(
+                        'Unexpected response error code',
+                        $response->getCode(),
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
         }
     }
 }

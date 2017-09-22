@@ -11,6 +11,9 @@ class RawHeadersParser
         $key = '';
 
         foreach (explode("\n", $rawHeaders) as $headerRow) {
+            if (trim($headerRow) === '') {
+                break;
+            }
             $headerArray = explode(':', $headerRow, 2);
 
             if (isset($headerArray[1])) {

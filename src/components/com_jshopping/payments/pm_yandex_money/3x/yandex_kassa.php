@@ -35,11 +35,11 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa', _JSHOP_YM_TAB_KASSA);
 <div class="row">
     <div class="span11 offset1">
         <div class="form-group">
-            <div class="span2"><label for="pm_params-shop-id">shopId</label></div>
+            <div class="span2"><label for="pm_params-shop-id"><?php echo _JSHOP_YM_KASSA_SHOP_ID_LABEL;?></label></div>
             <div class="span8">
                 <input name="pm_params[shop_id]" type="text" class="form-control" id="pm_params-shop-id"
                        value="<?php echo escapeValue($params['shop_id']); ?>">
-                <p class="help-block"><?php echo _JSHOP_YM_KASSA_SHOPID; ?></p>
+                <p class="help-block"><?php echo _JSHOP_YM_KASSA_SHOP_ID_DESCRIPTION; ?></p>
             </div>
         </div>
     </div>
@@ -47,11 +47,11 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa', _JSHOP_YM_TAB_KASSA);
 <div class="row">
     <div class="span11 offset1">
         <div class="form-group">
-            <div class="span2"><label for="pm-params-shop-password" class="">Секретный ключ</label></div>
+            <div class="span2"><label for="pm-params-shop-password" class=""><?php echo _JSHOP_YM_KASSA_PASSWORD_LABEL; ?></label></div>
             <div class="span8">
                 <input name="pm_params[shop_password]" type="text" class="form-control" id="pm-params-shop-password"
                        value="<?php echo escapeValue($params['shop_password']); ?>">
-                <p class="help-block"><?php echo _JSHOP_YM_KASSA_PSW; ?></p>
+                <p class="help-block"><?php echo _JSHOP_YM_KASSA_PASSWORD_DESCRIPTION; ?></p>
             </div>
         </div>
     </div>

@@ -15,6 +15,15 @@ function escapeValue($value)
 }
 
 ?>
+<style>
+    .help-block {
+        font-size: 11px;
+    }
+    p.help-block {
+        margin: 0;
+        padding: 3px 0;
+    }
+</style>
 <div class="col100">
 <fieldset class="adminform">
 <table class="admintable" width = "100%" >
@@ -41,22 +50,20 @@ function escapeValue($value)
     ?>
     </td>
 </tr>
-<tr class="individ org">
+<?php
+    $uri = JURI::getInstance();
+    $liveUrlHost = $uri->toString(array("scheme",'host', 'port'));
+    $sslUrlHost = 'https://'.$uri->toString(array('host', 'port'));
+
+    $notify_url = $sslUrlHost.SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=notify&js_paymentclass=pm_yandexmoney&no_lang=1");
+?>
+<tr class="individ">
     <td style="width:250px;" class="key">
         <b> <?php echo _JSHOP_YM_TESTMODE_DESCRIPTION;?></b>
     </td>
     <td>
         <?php echo JHTML::_('select.booleanlist', 'pm_params[testmode]', 'class = "inputbox" size = "1"', $params['testmode']); ?>
     </td>
-</tr>
-<?php
-    $uri = JURI::getInstance();
-    $liveurlhost = $uri->toString(array("scheme",'host', 'port'));
-    $sslurlhost = $uri->toString(array('host', 'port'));
-
-    $notify_url = 'https://'.$sslurlhost.SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=notify&js_paymentclass=pm_yandexmoney&no_lang=1");
-?>
-<tr class="individ">
     <td></td>
     <td>
         <?php echo _JSHOP_YM_REG_IND;?>:<br/><br>
@@ -73,28 +80,26 @@ function escapeValue($value)
     </td>
 </tr>
 
-<tr class="org">
+<tr>
     <td></td>
+    <td></td>
+</tr>
+<tr class="org">
+    <td  class="key">
+        <b><?php echo _JSHOP_YM_KASSA_SHOP_ID_LABEL;?></b>
+    </td>
     <td>
-        <?php echo _JSHOP_YM_REG_ORG;?>:<br/><br/>
-        <table style="border: 1px black solid;">
-            <tr>
-                <td style="border: 1px black solid; padding: 5px;"><?php echo _JSHOP_YM_PARAM?></td>
-                <td style="border: 1px black solid; padding: 5px;"><?php echo _JSHOP_YM_VALUE?></td>
-            </tr>
-            <tr>
-                <td style="border: 1px black solid; padding: 5px;">checkUrl/AvisoUrl</td>
-                <td style="border: 1px black solid; padding: 5px;"><?php echo $notify_url?></td>
-            </tr>
-            <tr>
-                <td style="border: 1px black solid; padding: 5px;">successURL</td>
-                <td style="border: 1px black solid; padding: 5px;"><?php echo _JSHOP_YM_RETURNURL; ?></td>
-            </tr>
-            <tr>
-                <td style="border: 1px black solid; padding: 5px;">failURL</td>
-                <td style="border: 1px black solid; padding: 5px;"><?php echo _JSHOP_YM_RETURNURL; ?></td>
-            </tr>
-        </table>
+        <input type = "text" class = "inputbox" name = "pm_params[shop_id]" size="45" value = "<?php echo $params['shop_id']?>" />
+        <p class="help-block"><?php echo _JSHOP_YM_KASSA_SHOP_ID_DESCRIPTION; ?></p>
+    </td>
+</tr>
+<tr class="org">
+    <td  class="key">
+        <b><?php echo _JSHOP_YM_KASSA_PASSWORD_LABEL; ?></b>
+    </td>
+    <td>
+        <input type = "text" class = "inputbox" name = "pm_params[shop_password]" size="45" value = "<?php echo $params['shop_password']?>" />
+        <p class="help-block"><?php echo _JSHOP_YM_KASSA_PASSWORD_DESCRIPTION; ?></p>
     </td>
 </tr>
 
@@ -109,77 +114,56 @@ function escapeValue($value)
     <td class="key" colspan="2"><br/><br/><b><?php echo _JSHOP_YM_METHODS_DESCRIPTION; ?></b></td>
 </tr>
 <?php
-$list_methods = array('ym' => 'PC','cards'=>'AC','cash'=>'GP','phone'=>'MC','wm'=>'WM','sb'=>'SB','ab'=>'AB','pb'=>'PB','ma'=>'MA','qw'=>'QW','qp'=>'QP','mp'=>'MP');
+$list_methods = array('ym' => 'PC','cards'=>'AC');
 foreach ($list_methods as $m_long => $m_short) : ?>
-    <tr <?php echo ($m_long=='ym' || $m_long=='cards')?'class="with-select"':'class="with-select org"'; ?>>
+    <tr class="individ">
         <td><?php echo constant('_JSHOP_YM_METHOD_'.strtoupper($m_long).'_DESCRIPTION');?></td>
         <td><?php print JHTML::_('select.booleanlist', 'pm_params[method_'.$m_long.']', 'class = "inputbox"', $params['method_'.$m_long]); ?></td>
     </tr>
 <?php endforeach; ?>
-<tr class="org">
-    <td class="key">
-        <b><?php echo _JSHOP_YM_TEXT_MPOS;?></b>
-    </td>
-    <td>
-        <?php echo JHTML::_('select.genericlist', $this->getArticlesList(), 'pm_params[page_mpos]', 'class = "inputbox" size = "1"', 'status_id', 'name', $params['page_mpos'] ); ?>
-    </td>
-</tr>
-<tr class="org">
-    <td  class="key">
-        <b><?php echo _JSHOP_YM_SHOPID;?></b>
-    </td>
-    <td>
-        <input type = "text" class = "inputbox" name = "pm_params[shopid]" size="45" value = "<?php echo $params['shopid']?>" />
-    </td>
-</tr>
+<?php foreach (\YaMoney\Model\PaymentMethodType::getEnabledValues() as $value) : ?>
+    <tr class="with-select org">
+        <td><?php echo constant('_JSHOP_YM_METHOD_'.strtoupper($value).'_DESCRIPTION');?></td>
+        <td><?php print JHTML::_('select.booleanlist', 'pm_params[method_'.$value.']', 'class = "inputbox"', $params['method_'.$value]); ?></td>
+    </tr>
+<?php endforeach; ?>
 
 <tr class="org">
-    <td  class="key">
-        <b><?php echo _JSHOP_YM_SCID;?></b>
-    </td>
-    <td>
-        <input type = "text" class = "inputbox" name = "pm_params[scid]" size="45" value = "<?php echo $params['scid']?>" />
-    </td>
-</tr>
-<tr class="org">
-    <td  class="key">
-        <b><?php echo _JSHOP_YM_PASSWORD;?></b>
-    </td>
-    <td>
-        <input type = "text" class = "inputbox" name = "pm_params[shoppassword]" size="45" value = "<?php echo $params['shoppassword']?>" />
-    </td>
-</tr>
-
-<tr class="org">
-    <td><b><?php echo _JSHOP_YM_KASSA_SEND_CHECK_LABEL; ?></b></td>
+    <td><b><?php echo _JSHOP_YM_KASSA_SEND_RECEIPT_LABEL; ?></b></td>
     <td>
         <input onclick="taxes_validate_mode(1)" type = "radio" class = "ya_kassa_send_check" name = "pm_params[ya_kassa_send_check]" value = "1"
             <?php if($params['ya_kassa_send_check']=='1') echo "checked"; ?> /> Включить <br>
         <input onclick="taxes_validate_mode(0)" type = "radio" class = "ya_kassa_send_check" name = "pm_params[ya_kassa_send_check]" value = "0"
             <?php if($params['ya_kassa_send_check']=='0') echo "checked"; ?> /> Выключить
-        <p class="help-block">Отправлять в Яндекс.Кассу данные для чеков (54-ФЗ) НДС</p>
     </td>
 </tr>
 
 <tr class="org"<?php ($params['ya_kassa_send_check']=='1' ? ' style="display:none;"' : '') ?> id="select_send_check">
     <td>
-        <b>Ставка в вашем магазине.</b><br />
+        <b>Сопоставьте ставки</b><br />
     </td>
     <td>
-        <p class="help-block">Слева — ставка НДС в вашем магазине, справа — в Яндекс.Кассе. Пожалуйста, сопоставьте их.</p>
-<?php foreach ($taxes as $k => $tax) : ?>
-    <div>
-        <span><?php echo $tax; ?>% передавать в Яндекс.Кассу как</span>
-        <select name="pm_params[ya_kassa_tax_<?php echo $k; ?>]" class=" fixed-width-xl" id="pm_params[ya_kassa_tax_<?php echo $k; ?>]">
-            <option <?php if ($params['ya_kassa_tax_'.$k] == 1) { ?> selected="selected" <?php } ?> value="1">Без НДС</option>
-            <option <?php if ($params['ya_kassa_tax_'.$k] == 2) { ?> selected="selected" <?php } ?> value="2">0%</option>
-            <option <?php if ($params['ya_kassa_tax_'.$k] == 3) { ?> selected="selected" <?php } ?> value="3">10%</option>
-            <option <?php if ($params['ya_kassa_tax_'.$k] == 4) { ?> selected="selected" <?php } ?> value="4">18%</option>
-            <option <?php if ($params['ya_kassa_tax_'.$k] == 5) { ?> selected="selected" <?php } ?> value="5">Расчётная ставка 10/110</option>
-            <option <?php if ($params['ya_kassa_tax_'.$k] == 6) { ?> selected="selected" <?php } ?> value="6">Расчётная ставка 18/118</option>
-        </select>
-    </div>
-<?php endforeach; ?>
+        <table>
+            <tr>
+                <th>Ставка в вашем магазине</th>
+                <th>Ставка для чека в налоговую</th>
+            </tr>
+            <?php foreach ($taxes as $k => $tax) : ?>
+                <tr>
+                    <td><?php echo $tax; ?></td>
+                    <td>
+                        <select name="pm_params[ya_kassa_tax_<?php echo $k; ?>]" class=" fixed-width-xl" id="pm_params[ya_kassa_tax_<?php echo $k; ?>]">
+                            <option <?php if ($params['ya_kassa_tax_'.$k] == 1) { ?> selected="selected" <?php } ?> value="1">Без НДС</option>
+                            <option <?php if ($params['ya_kassa_tax_'.$k] == 2) { ?> selected="selected" <?php } ?> value="2">0%</option>
+                            <option <?php if ($params['ya_kassa_tax_'.$k] == 3) { ?> selected="selected" <?php } ?> value="3">10%</option>
+                            <option <?php if ($params['ya_kassa_tax_'.$k] == 4) { ?> selected="selected" <?php } ?> value="4">18%</option>
+                            <option <?php if ($params['ya_kassa_tax_'.$k] == 5) { ?> selected="selected" <?php } ?> value="5">Расчётная ставка 10/110</option>
+                            <option <?php if ($params['ya_kassa_tax_'.$k] == 6) { ?> selected="selected" <?php } ?> value="6">Расчётная ставка 18/118</option>
+                        </select>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
     </td>
 </tr>
 
@@ -246,6 +230,26 @@ foreach ($list_methods as $m_long => $m_short) : ?>
     <td><?php echo _JSHOP_YM_PAYMENTS_STATUS_INFO; ?><br /><br /></td>
 </tr>
 
+<tr class="org">
+    <td></td>
+    <td>
+        <?php echo _JSHOP_YM_REG_ORG;?>:<br/><br/>
+        <table style="border: 1px black solid;">
+            <tr>
+                <td style="border: 1px black solid; padding: 5px;"><?php echo _JSHOP_YM_PARAM?></td>
+                <td style="border: 1px black solid; padding: 5px;"><?php echo _JSHOP_YM_VALUE?></td>
+            </tr>
+            <tr>
+                <td style="border: 1px black solid; padding: 5px;">Адрес для уведомлений</td>
+                <td style="border: 1px black solid; padding: 5px;">
+                    <?php echo $notify_url?><br />
+                    <p class="help-block">Этот адрес понадобится, только если его попросят специалисты Яндекс.Кассы</p>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+
 </table>
 </fieldset>
 </div>
@@ -276,11 +280,12 @@ foreach ($list_methods as $m_long => $m_short) : ?>
                 $("#paymentsmode").val('0');
                 $("#paymode").val('0');
             } else if (yandex_mode == 3) {
+                $(".org").show();
+                $(".without-select").show();
                 $(".with-select").hide();
                 $(".individ").hide();
                 $(".payments").hide();
-                $(".org").show();
-                $(".without-select").show();
+
 
                 $("#kassamode").val('1');
                 $("#moneymode").val('0');

@@ -2,6 +2,7 @@
 
 namespace YaMoney\Client;
 
+use Psr\Log\LoggerInterface;
 use YaMoney\Common\Exceptions\ApiConnectionException;
 use YaMoney\Common\Exceptions\ApiException;
 use YaMoney\Common\Exceptions\AuthorizeException;
@@ -59,10 +60,37 @@ class CurlClient implements ApiClientInterface
     private $curl;
 
     /**
+     * @var LoggerInterface|null
+     */
+    private $logger;
+
+    /**
+     * @param LoggerInterface|null $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * @inheritdoc
      */
     public function call($path, $method, $queryParams, $httpBody = null, $headers = array())
     {
+        if ($this->logger !== null) {
+            $message = 'Send request: ' . $method . ' ' . $path;
+            if (!empty($queryParams)) {
+                $message .= ' with query params: ' . json_encode($queryParams);
+            }
+            if (!empty($httpBody)) {
+                $message .= ' with body: ' . $httpBody;
+            }
+            if (!empty($httpBody)) {
+                $message .= ' with headers: ' . json_encode($headers);
+            }
+            $this->logger->info($message);
+        }
+
         $url = $this->getUrl() . $path;
 
         if (!empty($queryParams)) {
@@ -99,6 +127,15 @@ class CurlClient implements ApiClientInterface
 
         if (!$this->keepAlive) {
             $this->closeCurlConnection();
+        }
+
+        if ($this->logger !== null) {
+            $message = 'Response with code ' . $responseInfo['http_code'] . ' received with headers: '
+                . json_encode($httpHeaders);
+            if (!empty($httpBody)) {
+                $message .= ' and body: ' . $httpBody;
+            }
+            $this->logger->info($message);
         }
 
         return new ResponseObject(array(

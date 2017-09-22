@@ -1,6 +1,7 @@
 <?php
 
 namespace YaMoney\Client;
+use Psr\Log\LoggerInterface;
 
 /**
  * Interface ApiClientInterface
@@ -17,4 +18,9 @@ interface ApiClientInterface
      * @return mixed
      */
     public function call($path, $method, $queryParams, $httpBody = null, $headers = array());
+
+    /**
+     * @param LoggerInterface|null $logger
+     */
+    public function setLogger($logger);
 }

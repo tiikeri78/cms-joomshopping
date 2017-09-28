@@ -219,7 +219,7 @@ class pm_yandex_money extends PaymentRoot
         if ($this->mode === self::MODE_KASSA) {
             $this->processKassaPayment($pmConfigs, $order);
             // если произошла ошибка, редиректим на шаг выбора метода оплаты
-            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step5'));
+            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step5');
             $app = JFactory::getApplication();
             $app->redirect($redirectUrl);
         }

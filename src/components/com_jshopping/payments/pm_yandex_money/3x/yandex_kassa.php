@@ -83,7 +83,6 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa', _JSHOP_YM_TAB_KASSA);
         <p><?php echo _JSHOP_YM_KASSA_SELECT_TEXT; ?></p>
     </div>
 </div>
-
 <?php foreach (\YaMoney\Model\PaymentMethodType::getEnabledValues() as $value) : ?>
     <div class="row with-select">
         <div class="span11 offset1">

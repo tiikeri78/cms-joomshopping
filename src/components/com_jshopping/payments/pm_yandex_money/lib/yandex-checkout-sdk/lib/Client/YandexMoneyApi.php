@@ -8,6 +8,7 @@ use YaMoney\Common\Exceptions\BadApiRequestException;
 use YaMoney\Common\Exceptions\ForbiddenException;
 use YaMoney\Common\Exceptions\JsonException;
 use YaMoney\Common\Exceptions\InternalServerError;
+use YaMoney\Common\Exceptions\NotFoundException;
 use YaMoney\Common\Exceptions\UnauthorizedException;
 use YaMoney\Common\HttpVerb;
 use YaMoney\Common\LoggerWrapper;
@@ -468,6 +469,9 @@ class YandexMoneyApi
                 break;
             case InternalServerError::HTTP_CODE:
                 throw new InternalServerError($response->getHeaders(), $response->getBody());
+                break;
+            case NotFoundException::HTTP_CODE:
+                throw new NotFoundException($response->getHeaders(), $response->getBody());
                 break;
             default:
                 if ($response->getCode() > 399) {

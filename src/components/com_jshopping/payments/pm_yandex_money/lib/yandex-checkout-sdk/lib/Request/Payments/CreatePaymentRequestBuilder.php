@@ -79,9 +79,9 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
      * @throws EmptyPropertyValueException Выбрасывается если было передано пустое значение
      * @throws InvalidPropertyValueTypeException Выбрасывается если было передано не строковое значение
      */
-    public function setShopId($value)
+    public function setAccountId($value)
     {
-        $this->recipient->setShopId($value);
+        $this->recipient->setAccountId($value);
         return $this;
     }
 
@@ -93,9 +93,9 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
      * @throws EmptyPropertyValueException Выбрасывается если было передано пустое значение
      * @throws InvalidPropertyValueTypeException Выбрасывается если было передано не строковое значение
      */
-    public function setProductGroupId($value)
+    public function setGatewayId($value)
     {
-        $this->recipient->setProductGroupId($value);
+        $this->recipient->setGatewayId($value);
         return $this;
     }
 
@@ -409,9 +409,9 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
         if (!empty($options)) {
             $this->setOptions($options);
         }
-        $shopId = $this->recipient->getShopId();
-        $productCroupId = $this->recipient->getProductGroupId();
-        if (!empty($shopId) && !empty($productCroupId)) {
+        $accountId = $this->recipient->getAccountId();
+        $gatewayId = $this->recipient->getGatewayId();
+        if (!empty($accountId) && !empty($gatewayId)) {
             $this->currentObject->setRecipient($this->recipient);
         }
         if ($this->receipt->notEmpty()) {

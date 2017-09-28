@@ -9,7 +9,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-include dirname(__FILE__) . '/lib/autoload.php';
+// include dirname(__FILE__) . '/lib/autoload.php';
+
+JLoader::registerNamespace('YaMoney', dirname(__FILE__) . '/lib/yandex-checkout-sdk/lib', false, false, 'psr4');
+JLoader::registerNamespace('Psr\\Log', dirname(__FILE__) . '/lib/yandex-checkout-sdk/vendor/psr-log', false, false, 'psr4');
 
 class pm_yandex_money extends PaymentRoot
 {
@@ -215,7 +218,10 @@ class pm_yandex_money extends PaymentRoot
         $this->mode = $this->getMode($pmConfigs);
         if ($this->mode === self::MODE_KASSA) {
             $this->processKassaPayment($pmConfigs, $order);
-            die();
+            // если произошла ошибка, редиректим на шаг выбора метода оплаты
+            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step5'));
+            $app = JFactory::getApplication();
+            $app->redirect($redirectUrl);
         }
         $this->ym_pay_mode = ($pmConfigs['paymode'] == '1');
 
@@ -288,61 +294,71 @@ class pm_yandex_money extends PaymentRoot
         $uri = JURI::getInstance();
         $redirectUrl = $uri->toString(array('scheme', 'host', 'port'))
             . SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money&no_lang=1&order_id=" . $order->order_id);
-        $builder = \YaMoney\Request\Payments\CreatePaymentRequest::builder();
-        $builder->setAmount($order->order_total)
-            ->setCapture(false)
-            ->setClientIp($_SERVER['REMOTE_ADDR'])
-            ->setConfirmation(array(
-                'type' => \YaMoney\Model\ConfirmationType::REDIRECT,
-                'returnUrl' => $redirectUrl,
-            ))
-            ->setMetadata(array(
-                'order_id' => $order->order_id,
-            ));
+        try {
+            $builder = \YaMoney\Request\Payments\CreatePaymentRequest::builder();
+            $builder->setAmount($order->order_total)
+                ->setCapture(false)
+                ->setClientIp($_SERVER['REMOTE_ADDR'])
+                ->setConfirmation(array(
+                    'type' => \YaMoney\Model\ConfirmationType::REDIRECT,
+                    'returnUrl' => $redirectUrl,
+                ))
+                ->setMetadata(array(
+                    'order_id' => $order->order_id,
+                ));
 
-        $cart = JSFactory::getModel('cart', 'jshop');
-        if ($this->joomlaVersion === 2) {
-            $cart->load('cart');
-        } else {
-            $cart->init('cart', 1);
+            $cart = JSFactory::getModel('cart', 'jshop');
+            if ($this->joomlaVersion === 2) {
+                $cart->load('cart');
+            } else {
+                $cart->init('cart', 1);
+            }
+
+            $params = unserialize($order->payment_params_data);
+            if (!empty($params['payment_type'])) {
+                $builder->setPaymentMethodData(array(
+                    'type' => $params['payment_type'],
+                ));
+            }
+
+            $receipt = null;
+            if (count($cart->products) && isset($pmConfigs['ya_kassa_send_check']) && $pmConfigs['ya_kassa_send_check']) {
+                $this->factoryReceipt($builder, $pmConfigs, $cart, $order);
+            }
+
+            $request = $builder->build();
+            if ($request->hasReceipt()) {
+                $request->getReceipt()->normalize($request->getAmount());
+            }
+        } catch (\Exception $e) {
+            $this->log('error', 'Failed to build request: ' . $e->getMessage());
+            return null;
         }
 
-        $params = unserialize($order->payment_params_data);
-        if (!empty($params['payment_type'])) {
-            $builder->setPaymentMethodData(array(
-                'type' => $params['payment_type'],
-            ));
-        }
-
-        $receipt = null;
-        if (count($cart->products) && isset($pmConfigs['ya_kassa_send_check']) && $pmConfigs['ya_kassa_send_check']) {
-            $this->factoryReceipt($builder, $pmConfigs, $cart, $order);
-        }
-
-        $request = $builder->build();
-        if ($request->hasReceipt()) {
-            $request->getReceipt()->normalize($request->getAmount());
-        }
-
-        $tries = 0;
-        $key = $order->order_id . '-' . microtime(true);
-        do {
-            $payment = $this->getApiClient($pmConfigs)->createPayment($request, $key);
-            if ($payment === null) {
-                $tries++;
-                if ($tries > 3) {
-                    break;
+        try {
+            $tries = 0;
+            $key = $order->order_id . '-' . microtime(true);
+            do {
+                $payment = $this->getApiClient($pmConfigs)->createPayment($request, $key);
+                if ($payment === null) {
+                    $tries++;
+                    if ($tries > 3) {
+                        break;
+                    }
+                    sleep(2);
                 }
-                sleep(2);
-            }
-        } while ($payment === null);
+            } while ($payment === null);
 
-        $redirect = $redirectUrl;
-        if ($payment !== null) {
-            $confirmation = $payment->getConfirmation();
-            if ($confirmation instanceof \YaMoney\Model\Confirmation\ConfirmationRedirect) {
-                $redirect = $confirmation->getConfirmationUrl();
+            $redirect = $redirectUrl;
+            if ($payment !== null) {
+                $confirmation = $payment->getConfirmation();
+                if ($confirmation instanceof \YaMoney\Model\Confirmation\ConfirmationRedirect) {
+                    $redirect = $confirmation->getConfirmationUrl();
+                }
             }
+        } catch (\Exception $e) {
+            $this->log('error', 'Failed to create payment: ' . $e->getMessage());
+            return null;
         }
 
         $app = JFactory::getApplication();

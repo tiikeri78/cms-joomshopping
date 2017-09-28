@@ -15,7 +15,7 @@ class RefundsRequestSerializer
     private static $propertyMap = array(
         'refundId'       => 'refund_id',
         'paymentId'      => 'payment_id',
-        'productGroupId' => 'product_group_id',
+        'gatewayId'      => 'gateway_id',
         'createdGte'     => 'created_gte',
         'createdGt'      => 'created_gt',
         'createdLte'     => 'created_lte',
@@ -36,7 +36,7 @@ class RefundsRequestSerializer
     public function serialize(RefundsRequestInterface $request)
     {
         $result = array(
-            'shop_id' => $request->getShopId(),
+            'account_id' => $request->getAccountId(),
         );
         foreach (self::$propertyMap as $property => $name) {
             $value = $request->{$property};

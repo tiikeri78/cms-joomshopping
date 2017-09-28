@@ -7,18 +7,18 @@ namespace YaMoney\Model;
  *
  * @package YaMoney\Model
  *
- * @property-read string $shopId Идентификатор магазина
- * @property-read string $productGroupId Идентификатор товара
+ * @property-read string $accountId Идентификатор магазина
+ * @property-read string $gatewayId Идентификатор товара
  */
 interface RecipientInterface
 {
     /**
      * @return string Идентификатор магазина
      */
-    function getShopId();
+    function getAccountId();
 
     /**
      * @return string Идентификатор товара
      */
-    function getProductGroupId();
+    function getGatewayId();
 }

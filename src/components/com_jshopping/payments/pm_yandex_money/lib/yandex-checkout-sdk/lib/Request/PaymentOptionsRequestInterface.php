@@ -7,8 +7,8 @@ namespace YaMoney\Request;
  * 
  * @package YaMoney\Request
  * 
- * @property-read string $shopId Идентификатор магазина
- * @property-read string $productGroupId Идентификатор товара
+ * @property-read string $accountId Идентификатор магазина
+ * @property-read string $gatewayId Идентификатор товара
  * @property-read string $amount Сумма заказа
  * @property-read string $currency Код валюты
  * @property-read string $confirmationType Сценарий подтверждения платежа
@@ -19,25 +19,25 @@ interface PaymentOptionsRequestInterface
      * Возвращает идентификатор магазина для которого требуется провести платёж
      * @return string Идентификатор магазина
      */
-    function getShopId();
+    function getAccountId();
 
     /**
      * Проверяет был ли установлен идентификатор магазина
      * @return bool True если идентификатор магазина был установлен, false если нет
      */
-    function hasShopId();
+    function hasAccountId();
 
     /**
      * Возвращает идентификатор товара
      * @return string|null Идентификатор товара
      */
-    function getProductGroupId();
+    function getGatewayId();
 
     /**
      * Проверяет был ли установлен идентификатор товара
      * @return bool True если идентификатор товара был установлен, false если нет
      */
-    function hasProductGroupId();
+    function hasGatewayId();
 
     /**
      * Возвращает сумму заказа

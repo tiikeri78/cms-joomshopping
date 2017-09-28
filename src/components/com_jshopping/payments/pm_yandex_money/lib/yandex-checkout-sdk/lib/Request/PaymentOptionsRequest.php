@@ -14,8 +14,8 @@ use YaMoney\Model\CurrencyCode;
  *
  * @package YaMoney\Request
  *
- * @property string $shopId Идентификатор магазина
- * @property string $productGroupId Идентификатор товара
+ * @property string $accountId Идентификатор магазина
+ * @property string $gatewayId Идентификатор товара
  * @property string $amount Сумма заказа
  * @property string $currency Код валюты
  * @property string $confirmationType Сценарий подтверждения платежа
@@ -25,12 +25,12 @@ class PaymentOptionsRequest extends AbstractRequest implements PaymentOptionsReq
     /**
      * @var string Идентификатор магазина
      */
-    private $_shopId;
+    private $_accountId;
 
     /**
      * @var string Идентификатор товара
      */
-    private $_productGroupId;
+    private $_gatewayId;
 
     /**
      * @var string Сумма
@@ -51,32 +51,32 @@ class PaymentOptionsRequest extends AbstractRequest implements PaymentOptionsReq
      * Возвращает идентификатор магазина для которого требуется провести платёж
      * @return string Идентификатор магазина
      */
-    public function getShopId()
+    public function getAccountId()
     {
-        return $this->_shopId;
+        return $this->_accountId;
     }
 
     /**
      * Проверяет, был ли установлен идентификатор магазина
      * @return bool True если идентификатор магазина был установлен, false если нет
      */
-    public function hasShopId()
+    public function hasAccountId()
     {
-        return $this->_shopId !== null;
+        return $this->_accountId !== null;
     }
 
     /**
      * Устанавливает идентификатор магазина
      * @param string|null $value Значение идентификатора магазина, null если требуется удалить значение
      */
-    public function setShopId($value)
+    public function setAccountId($value)
     {
         if ($value === null || $value === '') {
-            $this->_shopId = null;
+            $this->_accountId = null;
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_shopId = (string)$value;
+            $this->_accountId = (string)$value;
         } else {
-            throw new \InvalidArgumentException('Invalid shop_id value type "' . gettype($value) . '"');
+            throw new \InvalidArgumentException('Invalid account_id value type "' . gettype($value) . '"');
         }
     }
 
@@ -84,32 +84,32 @@ class PaymentOptionsRequest extends AbstractRequest implements PaymentOptionsReq
      * Возвращает идентификатор товара
      * @return string Идентификатор товара
      */
-    public function getProductGroupId()
+    public function getGatewayId()
     {
-        return $this->_productGroupId;
+        return $this->_gatewayId;
     }
 
     /**
      * Проверяет, был ли установлен идентификатор товара
      * @return bool True если идентификатор товара был установлен, false если нет
      */
-    public function hasProductGroupId()
+    public function hasGatewayId()
     {
-        return !empty($this->_productGroupId);
+        return !empty($this->_gatewayId);
     }
 
     /**
      * Устанавливает идентификатор товара
      * @param string|null $value Значение идентификатора товара, null если требуется удалить значение
      */
-    public function setProductGroupId($value)
+    public function setGatewayId($value)
     {
         if ($value === null || $value === '') {
-            $this->_productGroupId = null;
+            $this->_gatewayId = null;
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_productGroupId = (string)$value;
+            $this->_gatewayId = (string)$value;
         } else {
-            throw new \InvalidArgumentException('Invalid product_group_id value type "' . gettype($value) . '"');
+            throw new \InvalidArgumentException('Invalid gateway_id value type "' . gettype($value) . '"');
         }
     }
 
@@ -239,8 +239,8 @@ class PaymentOptionsRequest extends AbstractRequest implements PaymentOptionsReq
      */
     public function validate()
     {
-        if (empty($this->_shopId)) {
-            $this->setValidationError('Shop id not specified');
+        if (empty($this->_accountId)) {
+            $this->setValidationError('Account id not specified');
             return false;
         }
         return true;

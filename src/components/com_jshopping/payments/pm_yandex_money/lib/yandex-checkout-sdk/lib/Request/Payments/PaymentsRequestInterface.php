@@ -8,8 +8,8 @@ namespace YaMoney\Request\Payments;
  * @package YaMoney\Request\Payments
  *
  * @property-read string|null $paymentId Идентификатор платежа
- * @property-read string|null $shopId Идентификатор магазина
- * @property-read string|null $productGroupId Идентификатор товара
+ * @property-read string|null $accountId Идентификатор магазина
+ * @property-read string|null $gatewayId Идентификатор товара
  * @property-read \DateTime|null $createdGte Время создания, от (включительно)
  * @property-read \DateTime|null $createdGt Время создания, от (не включая)
  * @property-read \DateTime|null $createdLte Время создания, до (включительно)
@@ -39,25 +39,25 @@ interface PaymentsRequestInterface
      * Возвращает идентификатор магазина, если он был задан
      * @return string|null Идентификатор магазина
      */
-    function getShopId();
+    function getAccountId();
 
     /**
      * Проверяет, был ли установлен идентификатор магазина
      * @return bool True если идентификатор магазина был установлен, false если нет
      */
-    function hasShopId();
+    function hasAccountId();
 
     /**
      * Возвращает идентификатор товара
      * @return string|null Идентификатор товара
      */
-    function getProductGroupId();
+    function getGatewayId();
 
     /**
      * Проверяет был ли установлен идентификатор товара
      * @return bool True если идентификатор товара был установлен, false если нет
      */
-    function hasProductGroupId();
+    function hasGatewayId();
 
     /**
      * Возвращает дату создания от которой будут возвращены платежи или null если дата не была установлена

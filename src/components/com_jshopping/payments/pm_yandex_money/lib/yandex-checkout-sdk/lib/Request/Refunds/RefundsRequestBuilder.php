@@ -62,9 +62,9 @@ class RefundsRequestBuilder extends AbstractRequestBuilder
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если в метод была передана не строка
      */
-    public function setShopId($value)
+    public function setAccountId($value)
     {
-        $this->currentObject->setShopId($value);
+        $this->currentObject->setAccountId($value);
         return $this;
     }
 
@@ -75,9 +75,9 @@ class RefundsRequestBuilder extends AbstractRequestBuilder
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если в метод была передана не строка
      */
-    public function setProductGroupId($value)
+    public function setGatewayId($value)
     {
-        $this->currentObject->setProductGroupId($value);
+        $this->currentObject->setGatewayId($value);
         return $this;
     }
 

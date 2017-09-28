@@ -9,8 +9,8 @@ namespace YaMoney\Request\Refunds;
  *
  * @property-read string $refundId
  * @property-read string $paymentId Идентификатор платежа
- * @property-read string $shopId Идентификатор магазина
- * @property-read string $productGroupId Идентификатор товара
+ * @property-read string $accountId Идентификатор магазина
+ * @property-read string $gatewayId Идентификатор товара
  * @property-read \DateTime $createdGte Время создания, от (включительно)
  * @property-read \DateTime $createdGt Время создания, от (не включая)
  * @property-read \DateTime $createdLte Время создания, до (включительно)
@@ -52,25 +52,25 @@ interface RefundsRequestInterface
      * Возвращает идентификатор магазина, если он был задан
      * @return string|null Идентификатор магазина
      */
-    function getShopId();
+    function getAccountId();
 
     /**
      * Проверяет, был ли установлен идентификатор магазина
      * @return bool True если идентификатор магазина был установлен, false если нет
      */
-    function hasShopId();
+    function hasAccountId();
 
     /**
      * Возвращает идентификатор товара
      * @return string|null Идентификатор товара
      */
-    function getProductGroupId();
+    function getGatewayId();
 
     /**
      * Проверяет был ли установлен идентификатор товара
      * @return bool True если идентификатор товара был установлен, false если нет
      */
-    function hasProductGroupId();
+    function hasGatewayId();
 
     /**
      * Возвращает дату создания от которой будут возвращены возвраты или null если дата не была установлена

@@ -45,12 +45,14 @@ abstract class AbstractPaymentResponse extends Payment implements PaymentInterfa
             }
             $this->setError($error);
         }
+        /* @todo не устанавливаем пока реципиента
         if (!empty($paymentInfo['recipient'])) {
             $recipient = new Recipient();
-            $recipient->setShopId($paymentInfo['recipient']['shop_id']);
-            $recipient->setProductGroupId($paymentInfo['recipient']['product_group_id']);
+            $recipient->setAccountId($paymentInfo['recipient']['account_id']);
+            $recipient->setGatewayId($paymentInfo['recipient']['gateway_id']);
             $this->setRecipient($recipient);
         }
+        */
         if (!empty($paymentInfo['captured_at'])) {
             $this->setCapturedAt(strtotime($paymentInfo['captured_at']));
         }
@@ -71,8 +73,8 @@ abstract class AbstractPaymentResponse extends Payment implements PaymentInterfa
             }
             $this->setConfirmation($confirmation);
         }
-        if (!empty($paymentInfo['refunded'])) {
-            $this->setRefunded($this->factoryAmount($paymentInfo['refunded']));
+        if (!empty($paymentInfo['refunded_amount'])) {
+            $this->setRefundedAmount($this->factoryAmount($paymentInfo['refunded_amount']));
         }
         if (!empty($paymentInfo['receipt_registration'])) {
             $this->setReceiptRegistration($paymentInfo['receipt_registration']);

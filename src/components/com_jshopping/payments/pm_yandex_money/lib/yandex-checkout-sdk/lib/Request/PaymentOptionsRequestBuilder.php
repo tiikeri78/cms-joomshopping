@@ -31,9 +31,9 @@ class PaymentOptionsRequestBuilder extends AbstractRequestBuilder
      * @param string|null $value Значение идентификатора магазина, null если требуется удалить значение
      * @return PaymentOptionsRequestBuilder Инстанс текущего билдера запросов
      */
-    public function setShopId($value)
+    public function setAccountId($value)
     {
-        $this->currentObject->setShopId($value);
+        $this->currentObject->setAccountId($value);
         return $this;
     }
 
@@ -42,9 +42,9 @@ class PaymentOptionsRequestBuilder extends AbstractRequestBuilder
      * @param string|null $value Значение идентификатора товара, null если требуется удалить значение
      * @return PaymentOptionsRequestBuilder Инстанс текущего билдера запросов
      */
-    public function setProductGroupId($value)
+    public function setGatewayId($value)
     {
-        $this->currentObject->setProductGroupId($value);
+        $this->currentObject->setGatewayId($value);
         return $this;
     }
 

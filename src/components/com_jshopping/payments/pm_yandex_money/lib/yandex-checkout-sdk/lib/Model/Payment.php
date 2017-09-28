@@ -24,7 +24,7 @@ use YaMoney\Model\PaymentMethod\AbstractPaymentMethod;
  * @property Confirmation\AbstractConfirmation $confirmation Способ подтверждения платежа
  * @property AmountInterface $charge Сумма к оплате покупателем
  * @property AmountInterface $income Сумма к получению магазином
- * @property AmountInterface $refunded Сумма возвращенных средств платежа
+ * @property AmountInterface $refundedAmount Сумма возвращенных средств платежа
  * @property bool $paid Признак оплаты заказа
  * @property string $receiptRegistration Состояние регистрации фискального чека
  * @property Metadata $metadata Метаданные платежа указанные мерчантом
@@ -57,11 +57,6 @@ class Payment extends AbstractObject implements PaymentInterface
     private $_amount;
 
     /**
-     * @var Receipt Данные фискального чека 54-ФЗ
-     */
-    private $_receipt;
-
-    /**
      * @var AbstractPaymentMethod Способ проведения платежа
      */
     private $_paymentMethod;
@@ -84,7 +79,7 @@ class Payment extends AbstractObject implements PaymentInterface
     /**
      * @var AmountInterface Сумма возвращенных средств платежа
      */
-    private $_refunded;
+    private $_refundedAmount;
 
     /**
      * @var bool Признак оплаты заказа
@@ -318,18 +313,18 @@ class Payment extends AbstractObject implements PaymentInterface
      * Возвращает сумму возвращенных средств
      * @return AmountInterface Сумма возвращенных средств платежа
      */
-    public function getRefunded()
+    public function getRefundedAmount()
     {
-        return $this->_refunded;
+        return $this->_refundedAmount;
     }
 
     /**
      * Устанавливает сумму возвращенных средств
      * @param AmountInterface $value Сумма возвращенных средств платежа
      */
-    public function setRefunded(AmountInterface $value)
+    public function setRefundedAmount(AmountInterface $value)
     {
-        $this->_refunded = $value;
+        $this->_refundedAmount = $value;
     }
 
     /**

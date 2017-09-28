@@ -12,8 +12,8 @@ use YaMoney\Model\Status;
  * Класс объекта запроса к API для получения списка платежей магазина
  *
  * @property string|null $paymentId Идентификатор платежа
- * @property string|null $shopId Идентификатор магазина
- * @property string|null $productGroupId Идентификатор товара
+ * @property string|null $accountId Идентификатор магазина
+ * @property string|null $gatewayId Идентификатор товара
  * @property \DateTime|null $createdGte Время создания, от (включительно)
  * @property \DateTime|null $createdGt Время создания, от (не включая)
  * @property \DateTime|null $createdLte Время создания, до (включительно)
@@ -35,12 +35,12 @@ class PaymentsRequest extends AbstractRequest implements PaymentsRequestInterfac
     /**
      * @var string Идентификатор магазина
      */
-    private $_shopId;
+    private $_accountId;
 
     /**
      * @var string Идентификатор товара
      */
-    private $_productGroupId;
+    private $_gatewayId;
 
     /**
      * @var \DateTime Время создания, от (включительно)
@@ -141,18 +141,18 @@ class PaymentsRequest extends AbstractRequest implements PaymentsRequestInterfac
      * Возвращает идентификатор магазина, если он был задан
      * @return string|null Идентификатор магазина
      */
-    public function getShopId()
+    public function getAccountId()
     {
-        return $this->_shopId;
+        return $this->_accountId;
     }
 
     /**
      * Проверяет, был ли установлен идентификатор магазина
      * @return bool True если идентификатор магазина был установлен, false если нет
      */
-    public function hasShopId()
+    public function hasAccountId()
     {
-        return $this->_shopId !== null;
+        return $this->_accountId !== null;
     }
 
     /**
@@ -161,15 +161,15 @@ class PaymentsRequest extends AbstractRequest implements PaymentsRequestInterfac
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если в метод была передана не строка
      */
-    public function setShopId($value)
+    public function setAccountId($value)
     {
         if ($value === null || $value === '') {
-            $this->_shopId = null;
+            $this->_accountId = null;
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_shopId = (string)$value;
+            $this->_accountId = (string)$value;
         } else {
             throw new InvalidPropertyValueTypeException(
-                'Invalid shopId value type in PaymentsRequest', 0, 'PaymentsRequest.shopId', $value
+                'Invalid accountId value type in PaymentsRequest', 0, 'PaymentsRequest.accountId', $value
             );
         }
     }
@@ -178,18 +178,18 @@ class PaymentsRequest extends AbstractRequest implements PaymentsRequestInterfac
      * Возвращает идентификатор товара
      * @return string|null Идентификатор товара
      */
-    public function getProductGroupId()
+    public function getGatewayId()
     {
-        return $this->_productGroupId;
+        return $this->_gatewayId;
     }
 
     /**
      * Проверяет был ли установлен идентификатор товара
      * @return bool True если идентификатор товара был установлен, false если нет
      */
-    public function hasProductGroupId()
+    public function hasGatewayId()
     {
-        return $this->_productGroupId !== null;
+        return $this->_gatewayId !== null;
     }
 
     /**
@@ -198,15 +198,15 @@ class PaymentsRequest extends AbstractRequest implements PaymentsRequestInterfac
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если в метод была передана не строка
      */
-    public function setProductGroupId($value)
+    public function setGatewayId($value)
     {
         if ($value === null || $value === '') {
-            $this->_productGroupId = null;
+            $this->_gatewayId = null;
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_productGroupId = (string)$value;
+            $this->_gatewayId = (string)$value;
         } else {
             throw new InvalidPropertyValueTypeException(
-                'Invalid productGroupId value type in PaymentsRequest', 0, 'PaymentsRequest.productGroupId', $value
+                'Invalid gatewayId value type in PaymentsRequest', 0, 'PaymentsRequest.gatewayId', $value
             );
         }
     }
@@ -668,7 +668,7 @@ class PaymentsRequest extends AbstractRequest implements PaymentsRequestInterfac
      */
     public function validate()
     {
-        if (empty($this->_shopId)) {
+        if (empty($this->_accountId)) {
             $this->setValidationError('Shop id not specified');
             return false;
         }

@@ -32,7 +32,7 @@ class PaymentMethodType extends AbstractEnum
     const ALFABANK = 'alfabank';
 
     protected static $validValues = array(
-        self::YANDEX_MONEY => false,
+        self::YANDEX_MONEY => true,
         self::BANK_CARD => true,
         self::SBERBANK => true,
         self::CASH => true,

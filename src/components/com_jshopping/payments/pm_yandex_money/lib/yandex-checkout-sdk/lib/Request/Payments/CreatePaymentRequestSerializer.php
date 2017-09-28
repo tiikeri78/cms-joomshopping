@@ -76,8 +76,8 @@ class CreatePaymentRequestSerializer
             }
         }
         if ($request->hasRecipient()) {
-            $result['recipient']['shop_id'] = $request->getRecipient()->getShopId();
-            $result['recipient']['product_group_id'] = $request->getRecipient()->getProductGroupId();
+            $result['recipient']['account_id'] = $request->getRecipient()->getAccountId();
+            $result['recipient']['gateway_id'] = $request->getRecipient()->getGatewayId();
         }
         if ($request->hasPaymentMethodData()) {
             $method = self::$paymentDataSerializerMap[$request->getPaymentMethodData()->getType()];

@@ -61,8 +61,8 @@ class PaymentsResponse
             }
             if (!empty($paymentInfo['recipient'])) {
                 $recipient = new Recipient();
-                $recipient->setShopId($paymentInfo['recipient']['shop_id']);
-                $recipient->setProductGroupId($paymentInfo['recipient']['product_group_id']);
+                $recipient->setAccountId($paymentInfo['recipient']['account_id']);
+                $recipient->setGatewayId($paymentInfo['recipient']['gateway_id']);
                 $payment->setRecipient($recipient);
             }
             if (!empty($paymentInfo['captured_at'])) {
@@ -79,9 +79,9 @@ class PaymentsResponse
                 }
                 $payment->setConfirmation($confirmation);
             }
-            if (!empty($paymentInfo['refunded'])) {
-                $payment->setRefunded(new MonetaryAmount(
-                    $paymentInfo['refunded']['value'], $paymentInfo['refunded']['currency']
+            if (!empty($paymentInfo['refunded_amount'])) {
+                $payment->setRefundedAmount(new MonetaryAmount(
+                    $paymentInfo['refunded_amount']['value'], $paymentInfo['refunded_amount']['currency']
                 ));
             }
             if (!empty($paymentInfo['receipt_registration'])) {

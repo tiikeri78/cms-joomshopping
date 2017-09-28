@@ -10,28 +10,28 @@ use YaMoney\Helpers\TypeCast;
 /**
  * Recipient - Получатель платежа
  *
- * @property string $shopId Идентификатор магазина
- * @property string $productGroupId Идентификатор товара
+ * @property string $accountId Идентификатор магазина
+ * @property string $gatewayId Идентификатор товара
  */
 class Recipient extends AbstractObject implements RecipientInterface
 {
     /**
      * @var string Идентификатор магазина
      */
-    private $_shopId;
+    private $_accountId;
 
     /**
      * @var string Идентификатор товара
      */
-    private $_productGroupId;
+    private $_gatewayId;
 
     /**
      * Возвращает идентификатор магазина
      * @return string Идентификатор магазина
      */
-    public function getShopId()
+    public function getAccountId()
     {
-        return $this->_shopId;
+        return $this->_accountId;
     }
 
     /**
@@ -40,15 +40,15 @@ class Recipient extends AbstractObject implements RecipientInterface
      * @throws EmptyPropertyValueException Выбрасывается если было передано пустое значение
      * @throws InvalidPropertyValueTypeException Выбрасывается если было передано не строковое значение
      */
-    public function setShopId($value)
+    public function setAccountId($value)
     {
         if ($value === null || $value === '') {
-            throw new EmptyPropertyValueException('Empty shopId value in Recipient', 0, 'Recipient.shopId');
+            throw new EmptyPropertyValueException('Empty accountId value in Recipient', 0, 'Recipient.accountId');
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_shopId = (string)$value;
+            $this->_accountId = (string)$value;
         } else {
             throw new InvalidPropertyValueTypeException(
-                'Invalid shopId value type in Recipient', 0, 'Recipient.shopId', $value
+                'Invalid accountId value type in Recipient', 0, 'Recipient.accountId', $value
             );
         }
     }
@@ -57,9 +57,9 @@ class Recipient extends AbstractObject implements RecipientInterface
      * Возвращает идентификатор товара
      * @return string Идентификатор товара
      */
-    public function getProductGroupId()
+    public function getGatewayId()
     {
-        return $this->_productGroupId;
+        return $this->_gatewayId;
     }
 
     /**
@@ -68,17 +68,17 @@ class Recipient extends AbstractObject implements RecipientInterface
      * @throws EmptyPropertyValueException Выбрасывается если было передано пустое значение
      * @throws InvalidPropertyValueTypeException Выбрасывается если было передано не строковое значение
      */
-    public function setProductGroupId($value)
+    public function setGatewayId($value)
     {
         if ($value === null || $value === '') {
             throw new EmptyPropertyValueException(
-                'Empty productGroupId value in Recipient', 0, 'Recipient.productGroupId'
+                'Empty gatewayId value in Recipient', 0, 'Recipient.gatewayId'
             );
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_productGroupId = (string)$value;
+            $this->_gatewayId = (string)$value;
         } else {
             throw new InvalidPropertyValueTypeException(
-                'Invalid productGroupId value type in Recipient', 0, 'Recipient.productGroupId', $value
+                'Invalid gatewayId value type in Recipient', 0, 'Recipient.gatewayId', $value
             );
         }
     }

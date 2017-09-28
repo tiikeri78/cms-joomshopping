@@ -15,8 +15,8 @@ use YaMoney\Model\RefundStatus;
  *
  * @property string $refundId Идентификатор возврата
  * @property string $paymentId Идентификатор платежа
- * @property string $shopId Идентификатор магазина
- * @property string $productGroupId Идентификатор товара
+ * @property string $accountId Идентификатор магазина
+ * @property string $gatewayId Идентификатор товара
  * @property \DateTime $createdGte Время создания, от (включительно)
  * @property \DateTime $createdGt Время создания, от (не включая)
  * @property \DateTime $createdLte Время создания, до (включительно)
@@ -43,12 +43,12 @@ class RefundsRequest extends AbstractRequest implements RefundsRequestInterface
     /**
      * @var string Идентификатор магазина
      */
-    private $_shopId;
+    private $_accountId;
 
     /**
      * @var string Идентификатор товара
      */
-    private $_productGroupId;
+    private $_gatewayId;
 
     /**
      * @var \DateTime Время создания, от (включительно)
@@ -192,18 +192,18 @@ class RefundsRequest extends AbstractRequest implements RefundsRequestInterface
      * Возвращает идентификатор магазина, если он был задан
      * @return string|null Идентификатор магазина
      */
-    public function getShopId()
+    public function getAccountId()
     {
-        return $this->_shopId;
+        return $this->_accountId;
     }
 
     /**
      * Проверяет, был ли установлен идентификатор магазина
      * @return bool True если идентификатор магазина был установлен, false если нет
      */
-    public function hasShopId()
+    public function hasAccountId()
     {
-        return !empty($this->_shopId);
+        return !empty($this->_accountId);
     }
 
     /**
@@ -212,15 +212,15 @@ class RefundsRequest extends AbstractRequest implements RefundsRequestInterface
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если в метод была передана не строка
      */
-    public function setShopId($value)
+    public function setAccountId($value)
     {
         if ($value === null || $value === '') {
-            $this->_shopId = null;
+            $this->_accountId = null;
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_shopId = (string)$value;
+            $this->_accountId = (string)$value;
         } else {
             throw new InvalidPropertyValueTypeException(
-                'Invalid shopId value type in RefundsRequest', 0, 'RefundsRequest.shopId', $value
+                'Invalid accountId value type in RefundsRequest', 0, 'RefundsRequest.accountId', $value
             );
         }
     }
@@ -229,18 +229,18 @@ class RefundsRequest extends AbstractRequest implements RefundsRequestInterface
      * Возвращает идентификатор товара
      * @return string|null Идентификатор товара
      */
-    public function getProductGroupId()
+    public function getGatewayId()
     {
-        return $this->_productGroupId;
+        return $this->_gatewayId;
     }
 
     /**
      * Проверяет был ли установлен идентификатор товара
      * @return bool True если идентификатор товара был установлен, false если нет
      */
-    public function hasProductGroupId()
+    public function hasGatewayId()
     {
-        return !empty($this->_productGroupId);
+        return !empty($this->_gatewayId);
     }
 
     /**
@@ -249,15 +249,15 @@ class RefundsRequest extends AbstractRequest implements RefundsRequestInterface
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если в метод была передана не строка
      */
-    public function setProductGroupId($value)
+    public function setGatewayId($value)
     {
         if ($value === null || $value === '') {
-            $this->_productGroupId = null;
+            $this->_gatewayId = null;
         } elseif (TypeCast::canCastToString($value)) {
-            $this->_productGroupId = (string)$value;
+            $this->_gatewayId = (string)$value;
         } else {
             throw new InvalidPropertyValueTypeException(
-                'Invalid productGroupId value type in RefundsRequest', 0, 'RefundsRequest.productGroupId', $value
+                'Invalid gatewayId value type in RefundsRequest', 0, 'RefundsRequest.gatewayId', $value
             );
         }
     }
@@ -719,7 +719,7 @@ class RefundsRequest extends AbstractRequest implements RefundsRequestInterface
      */
     public function validate()
     {
-        if (empty($this->_shopId)) {
+        if (empty($this->_accountId)) {
             $this->setValidationError('Shop id not specified');
             return false;
         }

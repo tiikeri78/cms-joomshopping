@@ -56,7 +56,7 @@ interface PaymentInterface
      * Возвращает сумму
      * @return AmountInterface Сумма платежа
      */
-    function getAmount();
+    public function getAmount();
 
     /**
      * Возвращает используемый способ проведения платежа
@@ -86,7 +86,7 @@ interface PaymentInterface
      * Возвращает сумму возвращенных средств
      * @return AmountInterface Сумма возвращенных средств платежа
      */
-    public function getRefunded();
+    public function getRefundedAmount();
 
     /**
      * Проверяет был ли уже оплачен заказ

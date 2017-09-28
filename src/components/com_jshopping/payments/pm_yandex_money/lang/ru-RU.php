@@ -39,7 +39,7 @@ define('_JSHOP_YM_KASSA_PAYMODE_KASSA', 'На стороне Кассы');
 define('_JSHOP_YM_KASSA_PAYMODE_SHOP', 'На стороне магазина');
 define('_JSHOP_YM_KASSA_PAYMODE_LINK', '<a href=\'https://tech.yandex.ru/money/doc/payment-solution/payment-form/payment-form-docpage/\' target=\'_blank\'>Подробнее о сценариях оплаты</a>');
 define('_JSHOP_YM_KASSA_SELECT_TEXT', 'Отметьте способы оплаты, которые указаны в вашем договоре с Яндекс.Деньгами');
-define('_JSHOP_YM_METHOD_YM_DESCRIPTION', 'Яндекс.Деньги');
+define('_JSHOP_YM_METHOD_YANDEX_MONEY_DESCRIPTION', 'Яндекс.Деньги');
 define('_JSHOP_YM_METHOD_CARDS_DESCRIPTION', 'Банковские карты');
 define('_JSHOP_YM_METHOD_BANK_CARD_DESCRIPTION', 'Банковские карты');
 define('_JSHOP_YM_METHOD_CASH_DESCRIPTION', 'Наличные через терминалы');

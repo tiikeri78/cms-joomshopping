@@ -7,10 +7,10 @@ class PaymentOptionsRequestSerializer
     public function serialize(PaymentOptionsRequestInterface $request)
     {
         $result = array(
-            'shop_id' => $request->getShopId(),
+            'account_id' => $request->getAccountId(),
         );
-        if ($request->hasProductGroupId()) {
-            $result['product_group_id'] = $request->getProductGroupId();
+        if ($request->hasGatewayId()) {
+            $result['gateway_id'] = $request->getGatewayId();
         }
         if ($request->hasAmount()) {
             $result['amount'] = $request->getAmount();

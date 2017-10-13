@@ -9,10 +9,12 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-// include dirname(__FILE__) . '/lib/autoload.php';
-
-JLoader::registerNamespace('YaMoney', dirname(__FILE__) . '/lib/yandex-checkout-sdk/lib', false, false, 'psr4');
-JLoader::registerNamespace('Psr\\Log', dirname(__FILE__) . '/lib/yandex-checkout-sdk/vendor/psr-log', false, false, 'psr4');
+if ((version_compare(JVERSION, '3.0', '<') > 0)) {
+    include dirname(__FILE__) . '/lib/autoload.php';
+} else {
+    JLoader::registerNamespace('YaMoney', dirname(__FILE__) . '/lib/yandex-checkout-sdk/lib', false, false, 'psr4');
+    JLoader::registerNamespace('Psr\\Log', dirname(__FILE__) . '/lib/yandex-checkout-sdk/vendor/psr-log', false, false, 'psr4');
+}
 
 class pm_yandex_money extends PaymentRoot
 {
@@ -26,6 +28,11 @@ class pm_yandex_money extends PaymentRoot
 
     public $existentcheckform = true;
     public $ym_pay_mode, $ym_test_mode, $ym_password, $ym_shopid, $ym_scid;
+
+    /**
+     * @var YandexMoney\Model\OrderModel
+     */
+    private $orderModel;
 
     public function __construct()
     {
@@ -361,6 +368,8 @@ class pm_yandex_money extends PaymentRoot
             return null;
         }
 
+        $this->getOrderModel()->savePayment($order->order_id, $payment);
+
         $app = JFactory::getApplication();
         $app->redirect($redirect);
     }
@@ -420,14 +429,18 @@ class pm_yandex_money extends PaymentRoot
         $this->mode = $this->getMode($pmConfigs);
         $params = array();
         if ($this->mode == self::MODE_KASSA) {
+            echo '0';
             if (!isset($_GET['order_id'])) {
+                echo '1';
                 $source = file_get_contents('php://input');
                 if (empty($source)) {
-                    return null;
+                    header('HTTP/1.1 400 Body is empty');
+                    die();
                 }
                 $json = json_decode($source, true);
                 if (empty($json)) {
-                    return null;
+                    header('HTTP/1.1 400 Invalid body');
+                    die();
                 }
                 $notification = new \YaMoney\Model\Notification\NotificationWaitingForCapture($json);
                 $params['order_id'] = $notification->getObject()->getMetadata()->offsetGet('order_id');
@@ -443,9 +456,29 @@ class pm_yandex_money extends PaymentRoot
                     header('HTTP/1.1 401 Payment not exists');
                     die();
                 }
+                echo '{"success":true,"payment_status":"'.$payment->getStatus().'"}';
+                die();
 
             } else {
                 $params['order_id'] = (int)$_GET['order_id'];
+                $paymentId = $this->getOrderModel()->getPaymentIdByOrderId($params['order_id']);
+                if (empty($paymentId)) {
+                    header('HTTP/1.1 404 Order not exists');
+                    die();
+                }
+                $payment = $this->fetchPayment($paymentId, $pmConfigs);
+                if ($payment === null) {
+                    header('HTTP/1.1 404 Order not exists');
+                    die();
+                }
+                if (!$payment->getPaid()) {
+                    $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
+                    $app = JFactory::getApplication();
+                    $app->redirect($redirectUrl);
+                }
+                if ($payment->getStatus() === \YaMoney\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
+                    $this->capturePayment($payment, $pmConfigs);
+                }
             }
         } else {
             $params['order_id'] = (int)$_POST['label'];
@@ -620,5 +653,16 @@ class pm_yandex_money extends PaymentRoot
             flock($fd, LOCK_UN);
             fclose($fd);
         }
+    }
+
+    /**
+     * @return \YandexMoney\Model\OrderModel
+     */
+    private function getOrderModel()
+    {
+        if ($this->orderModel === null) {
+            $this->orderModel = new \YandexMoney\Model\OrderModel();
+        }
+        return $this->orderModel;
     }
 }

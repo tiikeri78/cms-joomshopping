@@ -38,6 +38,22 @@ if ($pmConfigs['paymode'] != '1') : ?>
                         <label for="ym<?php echo $num; ?>"><?php echo constant('_JSHOP_YM_METHOD_' . strtoupper($long) . '_DESCRIPTION'); ?></label>
                     </td>
                 </tr>
+                <?php if ($long === \YaMoney\Model\PaymentMethodType::ALFABANK) : ?>
+                <tr class="highlight additional-field" id="ym-alfa-login-block" style="display:none;">
+                    <td colspan="3">
+                        <label for="ym-alfa-login">Логин в Альфа-Клике</label>
+                        <input type="text" name="params[pm_yandex_money][alfaLogin]" value="" id="ym-alfa-login" />
+                    </td>
+                </tr>
+                <?php endif; ?>
+                <?php if ($long === \YaMoney\Model\PaymentMethodType::QIWI) : ?>
+                <tr class="highlight additional-field" id="ym-qiwi-phone-block" style="display:none;">
+                    <td colspan="3">
+                        <label for="ym-qiwi-phone">Логин в Альфа-Клике</label>
+                        <input type="text" name="params[pm_yandex_money][alfaLogin]" value="" id="ym-alfa-login" />
+                    </td>
+                </tr>
+            <?php endif; ?>
             <?php endif;
         endforeach;
     ?>

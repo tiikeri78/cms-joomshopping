@@ -406,10 +406,10 @@ class pm_yandex_money extends PaymentRoot
 
         /** @var jshopCart $cart */
         $cart = JSFactory::getModel('cart', 'jshop');
-        if ($this->joomlaVersion === 2) {
-            $cart->load('cart');
+        if (method_exists($cart, 'init')) {
+            $cart->init('cart', 1);
         } else {
-            $cart->init('cart');
+            $cart->load('cart');
         }
 
         $payment = $this->getKassaPaymentMethod($pmConfigs)->createPayment($order, $cart, $redirectUrl);

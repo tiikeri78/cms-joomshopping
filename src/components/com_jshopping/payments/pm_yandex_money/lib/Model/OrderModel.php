@@ -40,7 +40,7 @@ class OrderModel
         $this->_db->setQuery($query);
         $record = $this->_db->loadRow();
         if (empty($record)) {
-            return false;
+            return null;
         }
         return $record[0];
     }

@@ -241,6 +241,7 @@ class pm_yandex_money extends PaymentRoot
                     header('HTTP/1.1 401 Payment not exists');
                     die();
                 }
+                $this->getOrderModel()->savePayment($order->order_id, $payment);
                 echo '{"success":true,"payment_status":"'.$payment->getStatus().'"}';
                 die();
 
@@ -272,6 +273,7 @@ class pm_yandex_money extends PaymentRoot
                     $this->log('debug', 'Payment '.$payment->getId().' for order#' . $order->order_id . ' wfc');
                     $result = $this->getKassaPaymentMethod($pmConfigs)->capturePayment($payment);
                     if ($result !== null) {
+                        $this->getOrderModel()->savePayment($order->order_id, $payment);
                         $this->log('debug', 'Payment '.$payment->getId().' for order#' . $order->order_id . ' captured');
                         $payment = $result;
                     }

@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('DS')) {
+    define(DS, DIRECTORY_SEPARATOR);
+}
+
 define('YANDEX_MONEY_SDK_ROOT_PATH', dirname(__FILE__) . DS . 'yandex-checkout-sdk' . DS . 'lib');
 define('YANDEX_MONEY_PSR_LOG_PATH', dirname(__FILE__) . DS . 'yandex-checkout-sdk' . DS . 'vendor' . DS . 'psr-log');
 define('YANDEX_MONEY_MODULE_PATH', dirname(__FILE__));

@@ -13,7 +13,7 @@ $uri = JURI::getInstance();
 $liveurlhost = $uri->toString(array("scheme",'host', 'port'));
 $sslurlhost = $uri->toString(array('host', 'port'));
 
-$notify_url = 'https://'.$sslurlhost.SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=notify&js_paymentclass=pm_yandexmoney&no_lang=1");
+$notify_url = 'https://'.$sslurlhost.SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=notify&js_paymentclass=pm_yandex_money&no_lang=1");
 
 function isSelected($params, $type)
 {
@@ -42,11 +42,13 @@ function escapeValue($value)
         <p><?php echo _JSHOP_YM_LICENSE_TEXT2; ?></p>
         <p><?php echo _JSHOP_YM_VERSION_DESCRIPTION; ?> <?php echo _JSHOP_YM_VERSION; ?></p>
 
-        <?php echo JHtml::_('bootstrap.startTabSet', 'yamTab', array('active' => 'kassa')); ?>
+        <?php echo JHtml::_('bootstrap.startTabSet', 'yamTab', array('active' => 'kassa-tab')); ?>
 
         <?php include(dirname(__FILE__).'/3x/yandex_kassa.php'); ?>
         <?php include(dirname(__FILE__).'/3x/yandex_money.php'); ?>
         <?php include(dirname(__FILE__).'/3x/yandex_payments.php'); ?>
+
+        <input type="hidden" name="pm_params[transaction_end_status]" id="transaction-end-status" />
 
         <?php echo JHtml::_('bootstrap.endTabSet'); ?>
     </fieldset>
@@ -81,9 +83,25 @@ function escapeValue($value)
                 jQuery('.pay-mode').each(function () {
                     if (this != self) {
                         this.checked = false;
+                    } else {
+                        var id = 'pm_params' + this.getAttribute('id') + '_transaction_end_status';
+                        document.getElementById('transaction-end-status').value = document.getElementById(id).value;
                     }
                 });
             }
         });
+        jQuery('.transaction-end-status').change(function () {
+            var id = this.dataset.type;
+            if (document.getElementById(id).checked) {
+                document.getElementById('transaction-end-status').value = this.value;
+            }
+        });
+        var payModes = jQuery('.pay-mode');
+        for (var i = 0; i < payModes.length; ++i) {
+            if (payModes[i].checked) {
+                var id = 'pm_params' + payModes[i].getAttribute('id') + '_transaction_end_status';
+                document.getElementById('transaction-end-status').value = document.getElementById(id).value;
+            }
+        }
     });
 </script>

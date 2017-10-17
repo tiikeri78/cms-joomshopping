@@ -37,13 +37,13 @@ if (isset($pmconfigs['kassamode']) && $pmconfigs['paymode']=='1' && $pmconfigs['
             if (isset($pmconfigs['method_' . $m_long]) && $pmconfigs['method_' . $m_long] == '1' || ($pmconfigs['moneymode'] == '1' && ($m_short == "PC" || $m_short == "AC"))) {
                 $num += 1; ?>
                 <tr class="highlight">
-                    <td><input type="radio" name="params[pm_yandexmoney][ym-payment-type]"
+                    <td><input type="radio" name="params[pm_yandex_money][ym-payment-type]"
                                value="<?php echo $m_short; ?>"
                             <?php if ($num == 1) {
                                 echo "checked";
                             } ?> id="ym<?php echo $num; ?>"></td>
                     <td><?php if ($m_short != 'MP') { ?><img
-                            src="<?php echo JURI::root(); ?>components/com_jshopping/images/yandexmoney/<?php echo strtolower($m_short); ?>.png"><?php } ?>
+                            src="<?php echo JURI::root(); ?>components/com_jshopping/images/yandex_money/<?php echo strtolower($m_short); ?>.png"><?php } ?>
                     </td>
                     <td>
                         <label for="ym<?php echo $num; ?>"><?php echo constant('_JSHOP_YM_METHOD_' . strtoupper($m_long) . '_DESCRIPTION'); ?></label>
@@ -57,7 +57,7 @@ if (isset($pmconfigs['kassamode']) && $pmconfigs['paymode']=='1' && $pmconfigs['
                 <label for="ya_payments_fio"><?php echo _JSHOP_YM_PAYMENTS_FIO_LABEL; ?></label>
             </td>
             <td>
-                <input type="text" class="inputbox" name="params[pm_yandexmoney][ya_payments_fio]" id="ya_payments_fio" value="<?php print $pmconfigs['ya_payments_fio']?>"/>
+                <input type="text" class="inputbox" name="params[pm_yandex_money][ya_payments_fio]" id="ya_payments_fio" value="<?php print $pmconfigs['ya_payments_fio']?>"/>
             </td>
         </tr>
         <tr>
@@ -69,7 +69,7 @@ if (isset($pmconfigs['kassamode']) && $pmconfigs['paymode']=='1' && $pmconfigs['
     </tbody>
  </table>
 <script type="text/javascript">
-function check_pm_yandexmoney(){
+function check_pm_yandex_money(){
     <?php if ($pmconfigs['paymentsmode'] == '1') : ?>
     var value = jQuery("#ya_payments_fio").val().trim();
     if (value.length == 0) {

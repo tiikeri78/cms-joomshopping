@@ -9,13 +9,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-if ((version_compare(JVERSION, '3.0', '<') > 0)) {
-    include dirname(__FILE__) . '/lib/autoload.php';
-} else {
-    JLoader::registerNamespace('YandexMoney\\Model', dirname(__FILE__) . '/lib/Model', false, false, 'psr4');
-    JLoader::registerNamespace('YaMoney', dirname(__FILE__) . '/lib/yandex-checkout-sdk/lib', false, false, 'psr4');
-    JLoader::registerNamespace('Psr\\Log', dirname(__FILE__) . '/lib/yandex-checkout-sdk/vendor/psr-log', false, false, 'psr4');
-}
+include dirname(__FILE__) . '/lib/autoload.php';
 
 class pm_yandex_money extends PaymentRoot
 {
@@ -343,10 +337,10 @@ class pm_yandex_money extends PaymentRoot
         $item_name = $liveUrlHost." ".sprintf(_JSHOP_PAYMENT_NUMBER, $order->order_number);
         $this->loadLanguageFile();
 
-        $return = $liveUrlHost.SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandexmoney&order_id=" . $order['id']);
+        $return = $liveUrlHost.SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money&order_id=" . $order['id']);
 
         $order->order_total = $this->fixOrderTotal($order);
-        if ($ym_params['ym-payment-type']=='MP'){
+        if ($ym_params['ym-payment-type'] == 'MP'){
             $app = JFactory::getApplication();
             $app->redirect(JRoute::_(JURI::root().'index.php?option=com_content&view=article&id='.$pmConfigs['page_mpos']));
         }
@@ -378,7 +372,7 @@ class pm_yandex_money extends PaymentRoot
             <?php echo _JSHOP_REDIRECT_TO_PAYMENT_PAGE; ?>
         </form>
     <?php } elseif ($this->mode == self::MODE_PAYMENTS) {
-        $this->finishOrder($order, $pmConfigs['transaction_end_status']);
+        $this->finishOrder($order, $pmConfigs['ym_pay_status']);
         $narrative = $this->parseTemplate($pmConfigs['ym_pay_desc'], $order);
         ?>
         <form method="POST" action="<?php echo $this->getFormUrl(); ?>" id="paymentform" name="paymentform">

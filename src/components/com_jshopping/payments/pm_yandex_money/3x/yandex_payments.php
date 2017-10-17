@@ -9,7 +9,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-echo JHtml::_('bootstrap.addTab', 'yamTab', 'payments', _JSHOP_YM_TAB_PAYMENTS);
+echo JHtml::_('bootstrap.addTab', 'yamTab', 'payments-tab', _JSHOP_YM_TAB_PAYMENTS);
 
 ?>
 <div class="row">
@@ -21,7 +21,7 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'payments', _JSHOP_YM_TAB_PAYMENTS);
     <div class="span4 offset2">
         <div class='form-horizontal'>
             <div class="form-group">
-                <input type = "checkbox" id='payments' class = "form-control pay-mode" name = "pm_params[paymentsmode]" value = "1"
+                <input type = "checkbox" id="payments" class = "form-control pay-mode" name = "pm_params[paymentsmode]" value = "1"
                     <?php if(isSelected($params, 'paymentsmode')) echo "checked"; ?> /><?php echo _JSHOP_YM_PAYMENTS_ON; ?>
             </div>
         </div>
@@ -53,10 +53,10 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'payments', _JSHOP_YM_TAB_PAYMENTS);
 <div class="row">
     <div class="span11 offset1">
         <div class="form-group">
-            <div class="span2"><label for="pm_params[ym_pay_status]" class="span2"><?php echo _JSHOP_YM_PAYMENTS_STATUS_LABEL; ?></label></div>
+            <div class="span2"><label for="pm_params[payments_transaction_end_status]" class="span2"><?php echo _JSHOP_YM_PAYMENTS_STATUS_LABEL; ?></label></div>
             <div class="span8">
                 <?php
-                echo JHTML::_('select.genericlist', $orders->getAllOrderStatus(), 'pm_params[transaction_end_status]', 'class = "inputbox" size = "1"', 'status_id', 'name', $params['transaction_end_status'] );
+                echo JHTML::_('select.genericlist', $orders->getAllOrderStatus(), 'pm_params[payments_transaction_end_status]', 'class="inputbox transaction-end-status" size="1" data-type="payments"', 'status_id', 'name', $params['payments_transaction_end_status'] );
                 ?><br />
                 <p class="help-block"><?php echo _JSHOP_YM_PAYMENTS_STATUS_INFO; ?></p>
             </div>

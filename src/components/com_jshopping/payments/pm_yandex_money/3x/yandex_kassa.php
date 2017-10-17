@@ -9,7 +9,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa', _JSHOP_YM_TAB_KASSA);
+echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
 
 ?>
 <div class="row">
@@ -21,7 +21,7 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa', _JSHOP_YM_TAB_KASSA);
     <div class="span4 offset2">
         <div class='form-horizontal'>
             <div class="form-group">
-                <input type = "checkbox" id='kassa' class = "form-control pay-mode" name = "pm_params[kassamode]" value = "1"
+                <input type = "checkbox" id="kassa" class = "form-control pay-mode" name = "pm_params[kassamode]" value = "1"
                     <?php if(isSelected($params, 'kassamode')) echo "checked"; ?> /> <?php echo _JSHOP_YM_KASSA_ON; ?>
             </div>
         </div>
@@ -154,7 +154,7 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa', _JSHOP_YM_TAB_KASSA);
             <div class="span2"><label for="pm_params[kassa_transaction_end_status]"><?php echo _JSHOP_YM_COMMON_STATUS; ?></label></div>
             <div class="span8">
                 <?php
-                print JHTML::_('select.genericlist', $orders->getAllOrderStatus(), 'pm_params[transaction_end_status]', 'class = "inputbox" size = "1"', 'status_id', 'name', $params['transaction_end_status'] );
+                print JHTML::_('select.genericlist', $orders->getAllOrderStatus(), 'pm_params[kassa_transaction_end_status]', 'class="inputbox transaction-end-status" size="1" data-type="kassa"', 'status_id', 'name', $params['kassa_transaction_end_status'] );
                 ?>
             </div>
         </div>

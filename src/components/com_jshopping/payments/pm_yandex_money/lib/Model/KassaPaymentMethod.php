@@ -83,7 +83,7 @@ class KassaPaymentMethod
                 } elseif ($paymentType === PaymentMethodType::QIWI) {
                     $paymentType = array(
                         'type' => $paymentType,
-                        'phone' => trim($params['qiwiPhone']),
+                        'phone' => preg_replace('/[^\d]+/', '', $params['qiwiPhone']),
                     );
                 }
                 $builder->setPaymentMethodData($paymentType);
@@ -106,7 +106,7 @@ class KassaPaymentMethod
 
         try {
             $tries = 0;
-            $key = $order->order_id . '-' . microtime(true);
+            $key = uniqid('', true);
             do {
                 $payment = $this->getClient()->createPayment($request, $key);
                 if ($payment === null) {

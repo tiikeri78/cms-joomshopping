@@ -58,11 +58,6 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
 </div>
 <div class="row">
     <div class="span11 offset1">
-        <p class=''><?php echo _JSHOP_YM_KASSA_PARAMS; ?></p>
-    </div>
-</div>
-<div class="row">
-    <div class="span11 offset1">
         <h4><?php echo _JSHOP_YM_KASSA_PAYMODE_HEAD; ?></h4>
     </div>
 </div>

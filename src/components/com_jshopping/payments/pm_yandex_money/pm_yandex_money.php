@@ -20,6 +20,7 @@ class pm_yandex_money extends PaymentRoot
 
     private $mode = -1;
     private $joomlaVersion;
+    private $lastError;
 
     public $existentcheckform = true;
     public $ym_pay_mode, $ym_test_mode, $ym_password, $ym_shopid, $ym_scid;
@@ -110,11 +111,14 @@ class pm_yandex_money extends PaymentRoot
                                 return false;
                             }
                             $phone = preg_replace('/[^\d]+/', '', $params['qiwiPhone']);
-                            if (empty($phone)) {
+                            if (empty($phone) || strlen($phone) < 4 || strlen($phone) > 16) {
+                                $this->setErrorMessage('Указанное значение не является телефонным номером');
                                 return false;
                             }
+                            $params['qiwiPhone'] = $phone;
                         } elseif ($paymentType === \YaMoney\Model\PaymentMethodType::ALFABANK) {
                             if (empty($params['alfaLogin'])) {
+                                $this->setErrorMessage('Укажите логин в Альфа-клике');
                                 return false;
                             }
                             $login = trim($params['alfaLogin']);
@@ -416,9 +420,11 @@ class pm_yandex_money extends PaymentRoot
             if ($confirmation instanceof \YaMoney\Model\Confirmation\ConfirmationRedirect) {
                 $redirect = $confirmation->getConfirmationUrl();
             }
+            $this->getOrderModel()->savePayment($order->order_id, $payment);
+        } else {
+            $redirect = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
+            $this->setErrorMessage('Не удалось создать платёж, попробуйте выбрать другой способ оплаты.');
         }
-
-        $this->getOrderModel()->savePayment($order->order_id, $payment);
 
         $app = JFactory::getApplication();
         $app->redirect($redirect);

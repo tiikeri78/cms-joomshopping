@@ -51,21 +51,6 @@ class pm_yandex_money extends PaymentRoot
         }
     }
 
-    private function getArticlesList()
-    {
-        JModelLegacy::addIncludePath(JPATH_SITE.'/components/com_content/models', 'ContentModel');
-        $model = JModelLegacy::getInstance('Articles', 'ContentModel', array('ignore_request' => true));
-        $params = JComponentHelper::getParams('com_content');
-        $model->setState('params', $params);
-        $model->setState('list.limit', 0);
-        $articles = $model->getItems();
-        $list = array();
-        foreach ($articles as $page) {
-            $list[$page->id] = $page->title;
-        }
-        return $list;
-    }
-
     public function getDisplayNameParams()
     {
         $names = array();
@@ -145,12 +130,12 @@ class pm_yandex_money extends PaymentRoot
             'method_cards', 'method_ym2', 'method_cards2', 'method_cash', 'method_phone', 'method_wm',
             'method_ab', 'method_sb', 'method_ma', 'method_pb', 'method_qw', 'method_qp', 'password',
             'shoppassword', 'shopid', 'scid', 'account', 'transaction_end_status', 'ym_pay_id', 'ym_pay_desc',
-            'ya_payments_fio'
+            'ya_payments_fio', 'page_mpos', 'ya_kassa_send_check', 'method_mp',
         );
         $taxes = $taxes = JSFactory::getAllTaxes();
 
         foreach ($taxes as $k => $tax) {
-            $array_params[] = 'kassa_tax_' . $k;
+            $array_params[] = 'ya_kassa_tax_' . $k;
         }
 
         foreach ($array_params as $key) {
@@ -163,8 +148,20 @@ class pm_yandex_money extends PaymentRoot
         }
         $this->loadLanguageFile();
         $orders = JModelLegacy::getInstance('orders', 'JshoppingModel'); //admin model
-        $filename = $this->joomlaVersion === 2 ? '2x' : '';
+        if ($this->joomlaVersion === 2) {
+            $filename = '2x';
+        } else {
+            $filename = '';
+            $dispatcher = JDispatcher::getInstance();
+            $dispatcher->register('onBeforeEditPayments', array($this, 'onBeforeEditPayments'));
+        }
         include(dirname(__FILE__)."/adminparamsform".$filename.".php");
+    }
+
+    public function onBeforeEditPayments($view)
+    {
+        $view->tmp_html_start = '';
+        $view->tmp_html_end = '';
     }
 
     private function loadLanguageFile()

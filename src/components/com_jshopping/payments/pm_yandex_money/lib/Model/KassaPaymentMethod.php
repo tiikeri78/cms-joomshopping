@@ -64,7 +64,9 @@ class KassaPaymentMethod
                 ->setCapture(false)
                 ->setClientIp($_SERVER['REMOTE_ADDR'])
                 ->setMetadata(array(
-                    'order_id' => $order->order_id,
+                    'order_id'       => $order->order_id,
+                    'cms_name'       => 'ya_api_joomshopping',
+                    'module_version' => _JSHOP_YM_VERSION,
                 ));
 
             $confirmation = array(

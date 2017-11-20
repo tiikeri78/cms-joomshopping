@@ -11,9 +11,9 @@ cd src
 zip -9 -r ../yandex-money-cms-v2-joomshopping.zip ./*
 
 cd ../
-cp -r src "$GIT_HUB_PROJECT_PATH""/";
-cp CHANGELOG.md "$GIT_HUB_PROJECT_PATH""/CHANGELOG.md";
-cp LICENSE "$GIT_HUB_PROJECT_PATH""/LICENSE";
-cp README.md "$GIT_HUB_PROJECT_PATH""/README.md";
+rsync -av --delete src "$GIT_HUB_PROJECT_PATH";
+rsync -av --delete CHANGELOG.md "$GIT_HUB_PROJECT_PATH""/CHANGELOG.md";
+rsync -av --delete LICENSE "$GIT_HUB_PROJECT_PATH""/LICENSE";
+rsync -av --delete README.md "$GIT_HUB_PROJECT_PATH""/README.md";
 
 mv "$ARCHIVE_FILE_NAME" "$GIT_HUB_PROJECT_PATH""/""$ARCHIVE_FILE_NAME";

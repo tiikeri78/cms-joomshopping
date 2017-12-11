@@ -2,6 +2,7 @@
 
 namespace YandexMoney\Updater\Archive;
 
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use YandexMoney\Updater\ProjectStructure\DirectoryEntryInterface;
 use YandexMoney\Updater\ProjectStructure\EntryInterface;
@@ -23,10 +24,16 @@ class RestoreZip
     private $zip;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Конструктор, открывает архив
      * @param string $fileName Имя файла архива
+     * @param LoggerInterface|null $logger
      */
-    public function __construct($fileName)
+    public function __construct($fileName, $logger = null)
     {
         if (!file_exists($fileName)) {
             throw new RuntimeException('Archive file "' . $fileName . '" not exists');
@@ -40,6 +47,7 @@ class RestoreZip
         if ($result !== true) {
             throw new RuntimeException('Failed to open zip archive "' . $fileName . '"', $result);
         }
+        $this->logger = $logger;
     }
 
     /**
@@ -69,12 +77,17 @@ class RestoreZip
     public function restore($mapFileName, $destinationDirectory)
     {
         if (!file_exists($destinationDirectory)) {
+            $message = 'Create directory ' . $destinationDirectory . ' ... ';
             if (!mkdir($destinationDirectory)) {
+                $this->log($message . ' failed');
                 throw new RuntimeException('Failed to create destination directory "' . $destinationDirectory . '"');
             }
+            $this->log($message . ' succeeded');
         } elseif (!is_dir($destinationDirectory)) {
+            $this->log('Invalid directory ' . $destinationDirectory . ' succeeded');
             throw new RuntimeException('Invalid destination directory "' . $destinationDirectory . '"');
         } elseif (!is_writable($destinationDirectory)) {
+            $this->log('Directory ' . $destinationDirectory . ' not writable');
             throw new RuntimeException('Destination directory "' . $destinationDirectory . '" not writable');
         }
 
@@ -149,7 +162,9 @@ class RestoreZip
     {
         if (!file_exists($directory)) {
             $this->prepareDirectory(dirname($directory));
+            $this->log('Create directory ' . $directory);
             if (!mkdir($directory)) {
+                $this->log('Failed to create directory ' . $directory);
                 throw new RuntimeException('Failed to create directory "' . $directory . '"');
             }
         }
@@ -185,9 +200,11 @@ class RestoreZip
         if (substr($name, -1) === '/') {
             $this->prepareDirectory($fileName);
         } else {
+            $this->log('Restore file ' . $fileName);
             $tmp = $this->zip->getFromIndex($index);
             $out = fopen($fileName, 'wb');
             if (!$out) {
+                $this->log('Restoration file ' . $fileName . ' failed');
                 throw new RuntimeException('Failed to create or open file "' . $fileName . '"');
             }
             fwrite($out, $tmp);
@@ -229,5 +246,12 @@ class RestoreZip
             fwrite($out, $tmp);
         }
         fclose($out);
+    }
+
+    private function log($message)
+    {
+        if ($this->logger !== null) {
+            $this->logger->log('info', $message);
+        }
     }
 }

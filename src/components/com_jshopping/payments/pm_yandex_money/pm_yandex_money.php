@@ -25,7 +25,7 @@ class pm_yandex_money extends PaymentRoot
     private $joomlaVersion;
     private $debugLog = true;
 
-    private $repository = 'yandex-money/yandex-money-cms-v2-joomshopping';
+    private $repository = 'actofgod/jshopping-module';
     private $downloadDirectory = 'pm_yandex_money';
     private $backupDirectory = 'pm_yandex_money/backups';
     private $versionDirectory = 'pm_yandex_money/download';
@@ -346,7 +346,7 @@ class pm_yandex_money extends PaymentRoot
             if ($this->createBackup(_JSHOP_YM_VERSION)) {
                 if ($this->unpackLastVersion($fileName)) {
                     $result = array(
-                        'message' => 'Версия модуля ' . $_POST['version'] . ' была успешно загружена и установлена',
+                        'message' => 'Версия модуля ' . $_POST['version'] . ' (' . $fileName . ') была успешно загружена и установлена',
                         'success' => true,
                     );
                 } else {
@@ -1097,7 +1097,7 @@ class pm_yandex_money extends PaymentRoot
 
         try {
             $sourceDirectory = dirname(dirname(JSH_DIR));
-            $archive = new \YandexMoney\Updater\Archive\RestoreZip($fileName);
+            $archive = new \YandexMoney\Updater\Archive\RestoreZip($fileName, $this);
             $archive->restore('joomshopping.map', $sourceDirectory);
         } catch (Exception $e) {
             $this->log('error', $e->getMessage());

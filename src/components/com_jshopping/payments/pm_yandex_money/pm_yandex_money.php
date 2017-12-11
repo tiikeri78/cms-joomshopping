@@ -964,6 +964,7 @@ class pm_yandex_money extends PaymentRoot
 
     private function dateDiffToString($timestamp)
     {
+        /*
         $diff = time() - $timestamp;
         if ($diff < 60) {
             return 'только что';
@@ -974,7 +975,8 @@ class pm_yandex_money extends PaymentRoot
         } elseif ($diff < 300) {
             return 'пару минут назад';
         }
-        return date('d.m.Y H:i:s', $timestamp);
+        */
+        return date('d.m.Y H:i', $timestamp);
     }
 
     public function getBackupList()

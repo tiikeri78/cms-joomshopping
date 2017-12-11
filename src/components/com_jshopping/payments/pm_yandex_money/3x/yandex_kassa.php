@@ -154,6 +154,40 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
             </div>
         </div>
     </div>
+    <div class="span11 offset1">
+        <div class="form-group">
+            <div class="span2"><label for="pm_params-debug_log">Debug log</label></div>
+            <div class="span8">
+                <select name="pm_params[debug_log]" id="pm_params-debug_log">
+                    <option value="1"<?php $params['debug_log'] == '1' ? ' selected' : '' ?>>Включить</option>
+                    <option value="0"<?php $params['debug_log'] == '1' ? '' : ' selected' ?>>Выключить</option>
+                </select><br />
+                <a href="javascript://" id="show_module_log">Просмотр логов модуля</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="log-modal-window" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Журнал сообщений модуля</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="padding:10px;">
+                    <pre id="logs-list"></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="clear-logs">Очистить журнал</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php echo JHtml::_('bootstrap.endTab'); ?>

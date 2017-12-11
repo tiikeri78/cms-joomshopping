@@ -80,24 +80,26 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'updater-tab', 'Обновления
         jQuery('#update-module').click(function () {
             var form = document.getElementById('adminForm');
             var paymentId = form.payment_id.value;
-            jQuery.ajax({
-                method: 'GET',
-                url: 'index.php',
-                data: {
-                    option: 'com_jshopping',
-                    controller: 'payments',
-                    task: 'edit',
-                    payment_id: paymentId,
-                    subaction: 'update'
-                },
-                dataType: 'json',
-                success: function (res) {
-                    alert(res.message);
-                    if (res.success) {
-                        document.location = document.location;
+            if (window.confirm('Вы действительно хотите обновить модуль до последней версии?')) {
+                jQuery.ajax({
+                    method: 'GET',
+                    url: 'index.php',
+                    data: {
+                        option: 'com_jshopping',
+                        controller: 'payments',
+                        task: 'edit',
+                        payment_id: paymentId,
+                        subaction: 'update'
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        alert(res.message);
+                        if (res.success) {
+                            document.location = document.location;
+                        }
                     }
-                }
-            });
+                });
+            }
         });
         jQuery('.remove-backup').click(function () {
             var form = document.getElementById('adminForm');

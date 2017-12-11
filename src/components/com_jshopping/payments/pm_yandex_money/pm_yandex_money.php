@@ -27,6 +27,8 @@ class pm_yandex_money extends PaymentRoot
 
     private $repository = 'yandex-money/yandex-money-cms-v2-joomshopping';
     private $downloadDirectory = 'pm_yandex_money';
+    private $backupDirectory = 'pm_yandex_money/backups';
+    private $versionDirectory = 'pm_yandex_money/download';
 
     public $existentcheckform = true;
     public $ym_pay_mode, $ym_test_mode, $ym_password, $ym_shopid, $ym_scid;
@@ -132,11 +134,41 @@ class pm_yandex_money extends PaymentRoot
      */
     public function showAdminFormParams($params)
     {
+        $this->loadLanguageFile();
+
         if (isset($_GET['subaction'])) {
+
             if ($_GET['subaction'] === 'get_log_messages') {
                 $this->viewModuleLogs();
             } elseif ($_GET['subaction'] === 'clear_log_messages') {
                 $this->clearModuleLogs();
+            } elseif ($_GET['subaction'] === 'restore_backup') {
+                ob_start();
+                $result = $this->restoreBackup();
+                $data = ob_get_clean();
+                if (!empty($data)) {
+                    $result['output'] = $data;
+                }
+                echo json_encode($result);
+                exit();
+            } elseif ($_GET['subaction'] === 'remove_backup') {
+                ob_start();
+                $result = $this->removeBackup();
+                $data = ob_get_clean();
+                if (!empty($data)) {
+                    $result['output'] = $data;
+                }
+                echo json_encode($result);
+                exit();
+            } elseif ($_GET['subaction'] === 'update') {
+                ob_start();
+                $result = $this->updateVersion();
+                $data = ob_get_clean();
+                if (!empty($data)) {
+                    $result['output'] = $data;
+                }
+                echo json_encode($result);
+                exit();
             }
         }
         $array_params = array(
@@ -163,7 +195,7 @@ class pm_yandex_money extends PaymentRoot
         if (!isset($params['use_ssl'])) {
             $params['use_ssl'] = 0;
         }
-        $this->loadLanguageFile();
+
         $orders = JModelLegacy::getInstance('orders', 'JshoppingModel'); //admin model
         if ($this->joomlaVersion === 2) {
             $filename = '2x';
@@ -188,6 +220,8 @@ class pm_yandex_money extends PaymentRoot
                 $newVersion = _JSHOP_YM_VERSION;
             }
             $newVersionInfo = $versionInfo;
+
+            $backups = $this->getBackupList();
 
             /*
             $update_action = $this->url->link('payment/yamoney/checkVersion', 'token=' . $this->session->data['token'], true);
@@ -236,6 +270,104 @@ class pm_yandex_money extends PaymentRoot
         }
         echo json_encode(array('success' => $success));
         exit();
+    }
+
+    private function restoreBackup()
+    {
+        if (!empty($_POST['file_name'])) {
+            $fileName = DIR_DOWNLOAD . '/' . $this->backupDirectory . '/' . $_POST['file_name'];
+            if (!file_exists($fileName)) {
+                $this->log('error', 'File "' . $fileName . '" not exists');
+                return array(
+                    'message' => 'Файл бэкапа ' . $fileName . ' не найден',
+                    'success' => false,
+                );
+            }
+            try {
+                $sourceDirectory = dirname(dirname(realpath(JSH_DIR)));
+                $archive = new \YandexMoney\Updater\Archive\RestoreZip($fileName);
+                $archive->restore('file_map.map', $sourceDirectory);
+            } catch (Exception $e) {
+                $this->log('error', $e->getMessage());
+                if ($e->getPrevious() !== null) {
+                    $this->log('error', $e->getPrevious()->getMessage());
+                }
+                return array(
+                    'message' => 'Не удалось восстановить модуль из бэкапа: ' . $e->getMessage(),
+                    'success' => false,
+                );
+            }
+            return array(
+                'message' => 'Модуль был успешно восстановлен из бэкапа: ' . $_POST['file_name'],
+                'success' => true,
+            );
+        }
+        return array(
+            'message' => 'Не был передан удаляемый файл бэкапа',
+            'success' => false,
+        );
+    }
+
+    public function removeBackup()
+    {
+        if (!empty($_POST['file_name'])) {
+            $fileName = DIR_DOWNLOAD . '/' . $this->backupDirectory . '/' . str_replace(array('/', '\\'), array('', ''), $_POST['file_name']);
+            if (!file_exists($fileName)) {
+                $this->log('error', 'File "' . $fileName . '" not exists');
+                return array(
+                    'message' => 'Файл бэкапа ' . $fileName . ' не найден',
+                    'success' => false,
+                );
+            }
+
+            if (!unlink($fileName) || file_exists($fileName)) {
+                $this->log('error', 'Failed to unlink file "' . $fileName . '"');
+                return array(
+                    'message' => 'Не удалось удалить файл бэкапа ' . $fileName,
+                    'success' => false,
+                );
+            }
+            return array(
+                'message' => 'Файл бэкапа ' . $fileName . ' был успешно удалён',
+                'success' => true,
+            );
+        }
+        return array(
+            'message' => 'Не был передан удаляемый файл бэкапа',
+            'success' => false,
+        );
+    }
+
+    public function updateVersion()
+    {
+        $versionInfo = $this->checkModuleVersion(false);
+        $fileName = $this->downloadLastVersion($versionInfo['tag']);
+        if (!empty($fileName)) {
+            if ($this->createBackup(_JSHOP_YM_VERSION)) {
+                if ($this->unpackLastVersion($fileName)) {
+                    $result = array(
+                        'message' => 'Версия модуля ' . $_POST['version'] . ' была успешно загружена и установлена',
+                        'success' => true,
+                    );
+                } else {
+                    $result = array(
+                        'message' => 'Не удалось распаковать загруженный архив ' . $fileName . ', подробную информацию о произошедшей ошибке можно найти в <a href="">логах модуля</a>',
+                        'success' => false,
+                    );
+                }
+            } else {
+                $result = array(
+                    'message' => 'Не удалось создать бэкап установленной версии модуля, подробную информацию о произошедшей ошибке можно найти в <a href="' . $logs . '">логах модуля</a>',
+                    'success' => false,
+                );
+            }
+        } else {
+            $result = array(
+                'message' => 'Не удалось загрузить архив с новой версией, подробную информацию о произошедшей ошибке можно найти в <a href="' . $logs . '">логах модуля</a>',
+                'success' => false,
+            );
+        }
+        return $result;
     }
 
     public function onBeforeEditPayments($view)
@@ -845,6 +977,35 @@ class pm_yandex_money extends PaymentRoot
         return date('d.m.Y H:i:s', $timestamp);
     }
 
+    public function getBackupList()
+    {
+        $result = array();
+
+        $this->preventDirectoryCreation();
+        $dir = DIR_DOWNLOAD . '/' . $this->backupDirectory;
+
+        $handle = opendir($dir);
+        while (($entry = readdir($handle)) !== false) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $ext = pathinfo($entry, PATHINFO_EXTENSION);
+            if ($ext === 'zip') {
+                $backup = array(
+                    'name'    => pathinfo($entry, PATHINFO_FILENAME) . '.zip',
+                    'size'    => $this->formatSize(filesize($dir . '/' . $entry)),
+                );
+                $parts = explode('-', $backup['name'], 3);
+                $backup['version'] = $parts[0];
+                $backup['time'] = $parts[1];
+                $backup['date'] = date('d.m.Y H:i:s', $parts[1]);
+                $backup['hash'] = $parts[2];
+                $result[] = $backup;
+            }
+        }
+        return $result;
+    }
+
     private function preventDirectoryCreation()
     {
         if (!file_exists(DIR_DOWNLOAD)) {
@@ -854,5 +1015,97 @@ class pm_yandex_money extends PaymentRoot
         if (!file_exists($dir)) {
             mkdir($dir);
         }
+        $dir = DIR_DOWNLOAD . '/' . $this->backupDirectory;
+        if (!file_exists($dir)) {
+            mkdir($dir);
+        }
+        $dir = DIR_DOWNLOAD . '/' . $this->versionDirectory;
+        if (!file_exists($dir)) {
+            mkdir($dir);
+        }
+    }
+
+    private function formatSize($size)
+    {
+        static $sizes = array(
+            'B', 'kB', 'MB', 'GB', 'TB',
+        );
+
+        $i = 0;
+        while ($size > 1024) {
+            $size /= 1024.0;
+            $i++;
+        }
+        return number_format($size, 2, '.', ',') . '&nbsp;' . $sizes[$i];
+    }
+
+    private function downloadLastVersion($tag, $useCache = true)
+    {
+        $this->preventDirectoryCreation();
+
+        $dir = DIR_DOWNLOAD . '/' . $this->versionDirectory;
+        if (!file_exists($dir)) {
+            if (!mkdir($dir)) {
+                $this->log('error', 'Не удалось создать директорию ' . $dir);
+                return false;
+            }
+        } elseif ($useCache) {
+            $fileName = $dir . '/' . $tag . '.zip';
+            if (file_exists($fileName)) {
+                return $fileName;
+            }
+        }
+
+        $connector = new \YandexMoney\Updater\GitHubConnector();
+        $fileName = $connector->downloadRelease($this->repository, $tag, $dir);
+        if (empty($fileName)) {
+            $this->log('error', 'Не удалось загрузить архив с обновлением');
+            return false;
+        }
+
+        return $fileName;
+    }
+
+    public function createBackup($version)
+    {
+        $this->preventDirectoryCreation();
+
+        $sourceDirectory = dirname(dirname(JSH_DIR));
+        $reader = new \YandexMoney\Updater\ProjectStructure\ProjectStructureReader();
+        $root = $reader->readFile(JSH_DIR . '/payments/pm_yandex_money/lib/joomshopping.map', $sourceDirectory);
+
+        $rootDir = $version . '-' . time();
+        $fileName = $rootDir . '-' . uniqid('', true) . '.zip';
+        $dir = DIR_DOWNLOAD . '/' . $this->backupDirectory;
+        try {
+            $fileName = $dir . '/' . $fileName;
+            $archive = new \YandexMoney\Updater\Archive\BackupZip($fileName, $rootDir);
+            $archive->backup($root);
+        } catch (Exception $e) {
+            $this->log('error', 'Failed to create backup: ' . $e->getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public function unpackLastVersion($fileName)
+    {
+        if (!file_exists($fileName)) {
+            $this->log('error', 'File "' . $fileName . '" not exists');
+            return false;
+        }
+
+        try {
+            $sourceDirectory = dirname(dirname(JSH_DIR));
+            $archive = new \YandexMoney\Updater\Archive\RestoreZip($fileName);
+            $archive->restore('joomshopping.map', $sourceDirectory);
+        } catch (Exception $e) {
+            $this->log('error', $e->getMessage());
+            if ($e->getPrevious() !== null) {
+                $this->log('error', $e->getPrevious()->getMessage());
+            }
+            return false;
+        }
+        return true;
     }
 }

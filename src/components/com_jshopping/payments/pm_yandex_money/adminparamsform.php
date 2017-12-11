@@ -111,6 +111,8 @@ function escapeValue($value)
         }
         jQuery('#show_module_log').click(showLogsHandler);
         jQuery('#clear-logs').click(clearLogsHandler);
+
+        jQuery('#adminForm > ul.nav-tabs a:last').tab('show');
     });
 
     function showLogsHandler() {

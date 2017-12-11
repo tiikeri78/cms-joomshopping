@@ -110,7 +110,7 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
         <div class="span6">Ставка для чека в налоговую</div>
     </div>
     <?php foreach ($taxes as $k => $tax) { ?>
-        <div class="span11 offset1 form-group row with-select">
+        <div class="span11 offset1 form-group row">
             <div class="span2 offset2"><label for="pm_params[ya_kassa_tax_<?php echo $k; ?>]" class=""><?php echo $tax; ?>%</label></div>
             <div class="span6">
                 <select name="pm_params[ya_kassa_tax_<?php echo $k; ?>]" class=" fixed-width-xl" id="pm_params[ya_kassa_tax_<?php echo $k; ?>]">

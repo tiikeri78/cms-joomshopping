@@ -132,7 +132,7 @@ class pm_yandex_money extends PaymentRoot
             'shoppassword', 'shopid', 'scid', 'account', 'transaction_end_status', 'ym_pay_id', 'ym_pay_desc',
             'ya_payments_fio', 'page_mpos', 'ya_kassa_send_check', 'method_mp',
         );
-        $taxes = $taxes = JSFactory::getAllTaxes();
+        $taxes = JSFactory::getAllTaxes();
 
         foreach ($taxes as $k => $tax) {
             $array_params[] = 'ya_kassa_tax_' . $k;

@@ -48,6 +48,11 @@ function escapeValue($value)
         <?php include(dirname(__FILE__).'/3x/yandex_kassa.php'); ?>
         <?php include(dirname(__FILE__).'/3x/yandex_money.php'); ?>
         <?php include(dirname(__FILE__).'/3x/yandex_payments.php'); ?>
+        <?php if (isset($newVersionInfo)) : ?>
+            <?php include(dirname(__FILE__).'/3x/yandex_update.php'); ?>
+        <?php else: ?>
+            <?php include(dirname(__FILE__).'/3x/yandex_update_disable.php'); ?>
+        <?php endif; ?>
 
         <input type="hidden" name="pm_params[transaction_end_status]" id="transaction-end-status" />
 

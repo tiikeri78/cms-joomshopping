@@ -1,5 +1,7 @@
 <?php
 
+namespace YandexMoney\Updater;
+
 class GitHubConnector
 {
     const DEFAULT_URL = 'https://github.com';

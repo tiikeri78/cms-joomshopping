@@ -9,6 +9,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+define('JSH_DIR', realpath(dirname(__FILE__) . '/../..'));
+define('DIR_DOWNLOAD', JSH_DIR . '/log');
+
 include dirname(__FILE__) . '/lib/autoload.php';
 
 class pm_yandex_money extends PaymentRoot
@@ -21,6 +24,9 @@ class pm_yandex_money extends PaymentRoot
     private $mode = -1;
     private $joomlaVersion;
     private $debugLog = true;
+
+    private $repository = 'yandex-money/yandex-money-cms-v2-joomshopping';
+    private $downloadDirectory = 'pm_yandex_money';
 
     public $existentcheckform = true;
     public $ym_pay_mode, $ym_test_mode, $ym_password, $ym_shopid, $ym_scid;
@@ -166,6 +172,29 @@ class pm_yandex_money extends PaymentRoot
             $dispatcher = JDispatcher::getInstance();
             $dispatcher->register('onBeforeEditPayments', array($this, 'onBeforeEditPayments'));
         }
+
+        $zip_enabled = function_exists('zip_open');
+        $curl_enabled = function_exists('curl_init');
+        if ($zip_enabled && $curl_enabled) {
+            $force = false;
+            $versionInfo = $this->checkModuleVersion($force);
+            if (version_compare($versionInfo['version'], _JSHOP_YM_VERSION) > 0) {
+                $new_version_available = true;
+                $changelog = $this->getChangeLog(_JSHOP_YM_VERSION, $versionInfo['version']);
+                $newVersion = $versionInfo['version'];
+            } else {
+                $new_version_available = false;
+                $changelog = '';
+                $newVersion = _JSHOP_YM_VERSION;
+            }
+            $newVersionInfo = $versionInfo;
+
+            /*
+            $update_action = $this->url->link('payment/yamoney/checkVersion', 'token=' . $this->session->data['token'], true);
+            $backup_action = $this->url->link('payment/yamoney/backups', 'token=' . $this->session->data['token'], true);
+            */
+        }
+
         include(dirname(__FILE__)."/adminparamsform".$filename.".php");
     }
 
@@ -726,9 +755,104 @@ class pm_yandex_money extends PaymentRoot
 
     private function getLogFileName()
     {
-        if (!defined('DS')) {
-            define('DS', DIRECTORY_SEPARATOR);
+        return realpath(JSH_DIR . '/log/pm_yandex_money.log');
+    }
+
+    public function checkModuleVersion($useCache = true)
+    {
+        $this->preventDirectoryCreation();
+
+        $file = DIR_DOWNLOAD . '/' . $this->downloadDirectory . '/version_log.txt';
+
+        if ($useCache) {
+            if (file_exists($file)) {
+                $content = preg_replace('/\s+/', '', file_get_contents($file));
+                if (!empty($content)) {
+                    $parts = explode(':', $content);
+                    if (count($parts) === 2) {
+                        if (time() - $parts[1] < 3600 * 8) {
+                            return array(
+                                'tag'     => $parts[0],
+                                'version' => preg_replace('/[^\d\.]+/', '', $parts[0]),
+                                'time'    => $parts[1],
+                                'date'    => $this->dateDiffToString($parts[1]),
+                            );
+                        }
+                    }
+                }
+            }
         }
-        return realpath(dirname(__FILE__) . DS . '..' . DS . '..') . DS . 'log' . DS . 'pm_yandex_money.log';
+
+        $connector = new \YandexMoney\Updater\GitHubConnector();
+        $version = $connector->getLatestRelease($this->repository);
+        if (empty($version)) {
+            return array();
+        }
+
+        $cache = $version . ':' . time();
+        file_put_contents($file, $cache);
+
+        return array(
+            'tag'     => $version,
+            'version' => preg_replace('/[^\d\.]+/', '', $version),
+            'time'    => time(),
+            'date'    => $this->dateDiffToString(time()),
+        );
+    }
+
+    public function getChangeLog($currentVersion, $newVersion)
+    {
+        $this->preventDirectoryCreation();
+
+        $connector = new \YandexMoney\Updater\GitHubConnector();
+
+        $dir = DIR_DOWNLOAD . '/' . $this->downloadDirectory;
+        $newChangeLog = $dir . '/CHANGELOG-' . $newVersion . '.md';
+        if (!file_exists($newChangeLog)) {
+            $fileName = $connector->downloadLatestChangeLog($this->repository, $dir);
+            if (!empty($fileName)) {
+                rename($dir . '/' . $fileName, $newChangeLog);
+            }
+        }
+
+        $oldChangeLog = $dir . '/CHANGELOG-' . $currentVersion . '.md';
+        if (!file_exists($oldChangeLog)) {
+            $fileName = $connector->downloadLatestChangeLog($this->repository, $dir);
+            if (!empty($fileName)) {
+                rename($dir . '/' . $fileName, $oldChangeLog);
+            }
+        }
+
+        $result = '';
+        if (file_exists($newChangeLog)) {
+            $result = $connector->diffChangeLog($oldChangeLog, $newChangeLog);
+        }
+        return $result;
+    }
+
+    private function dateDiffToString($timestamp)
+    {
+        $diff = time() - $timestamp;
+        if ($diff < 60) {
+            return 'только что';
+        } elseif ($diff < 120) {
+            return 'минуту назад';
+        } elseif ($diff < 180) {
+            return 'две минуты назад';
+        } elseif ($diff < 300) {
+            return 'пару минут назад';
+        }
+        return date('d.m.Y H:i:s', $timestamp);
+    }
+
+    private function preventDirectoryCreation()
+    {
+        if (!file_exists(DIR_DOWNLOAD)) {
+            mkdir(DIR_DOWNLOAD);
+        }
+        $dir = DIR_DOWNLOAD . '/' . $this->downloadDirectory;
+        if (!file_exists($dir)) {
+            mkdir($dir);
+        }
     }
 }

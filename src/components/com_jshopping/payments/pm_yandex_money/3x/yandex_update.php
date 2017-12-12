@@ -8,12 +8,6 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'updater-tab', 'Обновления
 
 <div class="row">
     <div class="span11 offset1">
-        <h4>Обновление модуля</h4>
-    </div>
-</div>
-
-<div class="row">
-    <div class="span11 offset1">
         <p>
             Здесь будут появляться новые версии модуля — с новыми возможностями или с исправленными ошибками.
             Чтобы установить новую версию модуля, нажмите кнопку «Обновить».

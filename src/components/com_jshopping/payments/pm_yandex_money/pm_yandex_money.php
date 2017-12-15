@@ -11,7 +11,7 @@ defined('_JEXEC') or die('Restricted access');
 
 include dirname(__FILE__) . '/lib/autoload.php';
 
-define('_JSHOP_YM_VERSION','1.0.3');
+define('_JSHOP_YM_VERSION','1.0.4');
 
 class pm_yandex_money extends PaymentRoot
 {

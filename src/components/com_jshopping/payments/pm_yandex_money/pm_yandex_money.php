@@ -168,6 +168,16 @@ class pm_yandex_money extends PaymentRoot
             $dispatcher = JDispatcher::getInstance();
             $dispatcher->register('onBeforeEditPayments', array($this, 'onBeforeEditPayments'));
         }
+
+        if ($params['kassamode']) {
+            if (!empty($params['shop_id']) && !empty($params['shop_password'])) {
+                $kassa = $this->getKassaPaymentMethod($params);
+                if (!$kassa->checkConnection()) {
+                    $errorCredentials = _JSHOP_YM_KASSA_CREDENTIALS_ERROR;
+                }
+            }
+        }
+
         include(dirname(__FILE__)."/adminparamsform".$filename.".php");
     }
 

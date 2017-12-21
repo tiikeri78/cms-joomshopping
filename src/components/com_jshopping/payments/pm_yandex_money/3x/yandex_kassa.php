@@ -26,6 +26,15 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
     </div>
 </div>
 <?php endif; ?>
+<?php if (isset($testWarning)) : ?>
+<div class="row">
+    <div class="span10 offset1">
+        <div class="alert alert-info"><i class="fa fa-exclamation-circle"></i> <?php echo $testWarning; ?>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 <div class="row">
     <div class="span4 offset2">
         <div class='form-horizontal'>

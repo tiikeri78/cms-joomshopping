@@ -175,6 +175,9 @@ class pm_yandex_money extends PaymentRoot
                 if (!$kassa->checkConnection()) {
                     $errorCredentials = _JSHOP_YM_KASSA_CREDENTIALS_ERROR;
                 }
+                if (strncmp('test_', $params['shop_password'], 5) === 0) {
+                    $testWarning = _JSHOP_YM_KASSA_TEST_WARNING;
+                }
             }
         }
 

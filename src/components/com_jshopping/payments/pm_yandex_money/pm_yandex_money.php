@@ -279,7 +279,7 @@ class pm_yandex_money extends PaymentRoot
             if (!file_exists($fileName)) {
                 $this->log('error', 'File "' . $fileName . '" not exists');
                 return array(
-                    'message' => 'Файл бэкапа ' . $fileName . ' не найден',
+                    'message' => 'Файл резервной копии ' . $fileName . ' не найден',
                     'success' => false,
                 );
             }
@@ -293,17 +293,17 @@ class pm_yandex_money extends PaymentRoot
                     $this->log('error', $e->getPrevious()->getMessage());
                 }
                 return array(
-                    'message' => 'Не удалось восстановить модуль из бэкапа: ' . $e->getMessage(),
+                    'message' => 'Не удалось восстановить модуль из резервной копии: ' . $e->getMessage(),
                     'success' => false,
                 );
             }
             return array(
-                'message' => 'Модуль был успешно восстановлен из бэкапа: ' . $_POST['file_name'],
+                'message' => 'Модуль был успешно восстановлен из резервной копии: ' . $_POST['file_name'],
                 'success' => true,
             );
         }
         return array(
-            'message' => 'Не был передан удаляемый файл бэкапа',
+            'message' => 'Не был передан удаляемый файл резервной копии',
             'success' => false,
         );
     }
@@ -315,7 +315,7 @@ class pm_yandex_money extends PaymentRoot
             if (!file_exists($fileName)) {
                 $this->log('error', 'File "' . $fileName . '" not exists');
                 return array(
-                    'message' => 'Файл бэкапа ' . $fileName . ' не найден',
+                    'message' => 'Файл резервной копии ' . $fileName . ' не найден',
                     'success' => false,
                 );
             }
@@ -323,17 +323,17 @@ class pm_yandex_money extends PaymentRoot
             if (!unlink($fileName) || file_exists($fileName)) {
                 $this->log('error', 'Failed to unlink file "' . $fileName . '"');
                 return array(
-                    'message' => 'Не удалось удалить файл бэкапа ' . $fileName,
+                    'message' => 'Не удалось удалить файл резервной копии ' . $fileName,
                     'success' => false,
                 );
             }
             return array(
-                'message' => 'Файл бэкапа ' . $fileName . ' был успешно удалён',
+                'message' => 'Файл резервной копии ' . $fileName . ' был успешно удалён',
                 'success' => true,
             );
         }
         return array(
-            'message' => 'Не был передан удаляемый файл бэкапа',
+            'message' => 'Не был передан удаляемый файл резервной копии',
             'success' => false,
         );
     }
@@ -357,7 +357,7 @@ class pm_yandex_money extends PaymentRoot
                 }
             } else {
                 $result = array(
-                    'message' => 'Не удалось создать бэкап установленной версии модуля, подробную информацию о произошедшей ошибке можно найти в <a href="' . $logs . '">логах модуля</a>',
+                    'message' => 'Не удалось создать резервную копию установленной версии модуля, подробную информацию о произошедшей ошибке можно найти в <a href="' . $logs . '">логах модуля</a>',
                     'success' => false,
                 );
             }

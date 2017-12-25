@@ -197,7 +197,7 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
             </div>
             <div class="modal-body">
                 <div style="padding:10px;">
-                    <pre id="logs-list"></pre>
+                    <pre id="logs-list" style="overflow:scroll;"></pre>
                 </div>
             </div>
             <div class="modal-footer">

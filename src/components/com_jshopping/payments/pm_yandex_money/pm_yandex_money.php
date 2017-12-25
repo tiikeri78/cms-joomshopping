@@ -14,6 +14,8 @@ define('DIR_DOWNLOAD', JSH_DIR . '/log');
 
 include dirname(__FILE__) . '/lib/autoload.php';
 
+define('_JSHOP_YM_VERSION','1.0.3');
+
 class pm_yandex_money extends PaymentRoot
 {
     const MODE_OFF = 0;
@@ -222,11 +224,18 @@ class pm_yandex_money extends PaymentRoot
             $newVersionInfo = $versionInfo;
 
             $backups = $this->getBackupList();
+        }
 
-            /*
-            $update_action = $this->url->link('payment/yamoney/checkVersion', 'token=' . $this->session->data['token'], true);
-            $backup_action = $this->url->link('payment/yamoney/backups', 'token=' . $this->session->data['token'], true);
-            */
+        if ($params['kassamode']) {
+            if (!empty($params['shop_id']) && !empty($params['shop_password'])) {
+                $kassa = $this->getKassaPaymentMethod($params);
+                if (!$kassa->checkConnection()) {
+                    $errorCredentials = _JSHOP_YM_KASSA_CREDENTIALS_ERROR;
+                }
+                if (strncmp('test_', $params['shop_password'], 5) === 0) {
+                    $testWarning = _JSHOP_YM_KASSA_TEST_WARNING;
+                }
+            }
         }
 
         include(dirname(__FILE__)."/adminparamsform".$filename.".php");

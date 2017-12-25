@@ -27,7 +27,7 @@ class pm_yandex_money extends PaymentRoot
     private $joomlaVersion;
     private $debugLog = true;
 
-    private $repository = 'actofgod/jshopping-module';
+    private $repository = 'yandex-money/yandex-money-cms-v2-joomshopping';
     private $downloadDirectory = 'pm_yandex_money';
     private $backupDirectory = 'pm_yandex_money/backups';
     private $versionDirectory = 'pm_yandex_money/download';

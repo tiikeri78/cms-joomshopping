@@ -184,5 +184,3 @@ define('_JSHOP_YM_CLEAR_LOGS', 'Очистить журнал');
 define('_JSHOP_YM_CLOSE', 'Закрыть');
 define('_JSHOP_YM_LOGS_LABEL', 'Журнал сообщений модуля');
 
-define('_JSHOP_YM_TAB_UPDATE', 'Обновления');
-

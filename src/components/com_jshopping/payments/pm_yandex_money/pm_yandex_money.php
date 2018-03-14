@@ -466,6 +466,15 @@ class pm_yandex_money extends PaymentRoot
                 } elseif ($payment->getStatus() !== \YaMoney\Model\PaymentStatus::SUCCEEDED) {
                     $this->log('debug', 'Notification error: payment not exist 401');
                     header('HTTP/1.1 401 Payment not exists');
+//                    $order = JSFactory::getTable('order', 'jshop');
+//                    $order->load($order_id);
+                    $pm_method = $order->getPayment();
+                    $paymentsysdata = $pm_method->getPaymentSystemData();
+                    $payment_system = $paymentsysdata->paymentSystem;
+                    if ($payment_system){
+                        $pmconfigs = $pm_method->getConfigs();
+                        $payment_system->complete($pmconfigs, $order, $pm_method);
+                    }
                     die();
                 }
                 $this->getOrderModel()->savePayment($order->order_id, $payment);

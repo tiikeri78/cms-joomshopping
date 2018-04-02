@@ -100,8 +100,8 @@ class pm_yandex_money extends PaymentRoot
                 if (empty($paymentType) && $pmConfigs['paymode'] == '1') {
                     return true;
                 } else {
-                    if (\YaMoney\Model\PaymentMethodType::valueExists($paymentType)) {
-                        if ($paymentType === \YaMoney\Model\PaymentMethodType::QIWI) {
+                    if (\YandexCheckout\Model\PaymentMethodType::valueExists($paymentType)) {
+                        if ($paymentType === \YandexCheckout\Model\PaymentMethodType::QIWI) {
                             if (empty($params['qiwiPhone'])) {
                                 return false;
                             }
@@ -111,7 +111,7 @@ class pm_yandex_money extends PaymentRoot
                                 return false;
                             }
                             $params['qiwiPhone'] = $phone;
-                        } elseif ($paymentType === \YaMoney\Model\PaymentMethodType::ALFABANK) {
+                        } elseif ($paymentType === \YandexCheckout\Model\PaymentMethodType::ALFABANK) {
                             if (empty($params['alfaLogin'])) {
                                 $this->setErrorMessage('Укажите логин в Альфа-клике');
                                 return false;
@@ -457,13 +457,13 @@ class pm_yandex_money extends PaymentRoot
                     header('HTTP/1.1 400 Invalid body');
                     die();
                 }
-                $notification = new \YaMoney\Model\Notification\NotificationWaitingForCapture($json);
+                $notification = new \YandexCheckout\Model\Notification\NotificationWaitingForCapture($json);
                 $payment = $this->getKassaPaymentMethod($pmConfigs)->capturePayment($notification->getObject());
                 if ($payment === null) {
                     $this->log('debug', 'Notification error: payment not exist');
                     header('HTTP/1.1 404 Payment not exists');
                     die();
-                } elseif ($payment->getStatus() !== \YaMoney\Model\PaymentStatus::SUCCEEDED) {
+                } elseif ($payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
                     $this->log('debug', 'Notification error: payment not exist 401');
                     header('HTTP/1.1 401 Payment not exists');
                     die();
@@ -490,13 +490,13 @@ class pm_yandex_money extends PaymentRoot
                     $app = JFactory::getApplication();
                     $app->redirect($redirectUrl);
                 }
-                if ($payment->getStatus() === \YaMoney\Model\PaymentStatus::CANCELED) {
+                if ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::CANCELED) {
                     $this->log('debug', 'Payment '.$payment->getId().' for order#' . $order->order_id . ' is canceled');
                     return array(4, 'Transaction is cancelled', $transactionId, 'Платёж не был проведён');
-                } elseif ($payment->getStatus() === \YaMoney\Model\PaymentStatus::PENDING) {
+                } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::PENDING) {
                     $this->log('debug', 'Payment '.$payment->getId().' for order#' . $order->order_id . ' is pended');
                     return array(2, 'Ожидается проведение оплаты', $transactionId, 'Ожидается проведение оплаты');
-                } elseif ($payment->getStatus() === \YaMoney\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
+                } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
                     $this->log('debug', 'Payment '.$payment->getId().' for order#' . $order->order_id . ' wfc');
                     $result = $this->getKassaPaymentMethod($pmConfigs)->capturePayment($payment);
                     if ($result !== null) {
@@ -505,7 +505,7 @@ class pm_yandex_money extends PaymentRoot
                         $payment = $result;
                     }
                 }
-                if ($payment->getStatus() === \YaMoney\Model\PaymentStatus::SUCCEEDED) {
+                if ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
                     $this->log('debug', 'Payment '.$payment->getId().' for order#' . $order->order_id . ' succeeded');
                     return array(1, 'Платёж ' . $transactionId . ' проведён', $transactionId, 'Оплата была проведена');
                 } else {
@@ -646,7 +646,7 @@ class pm_yandex_money extends PaymentRoot
         $redirect = $redirectUrl;
         if ($payment !== null) {
             $confirmation = $payment->getConfirmation();
-            if ($confirmation instanceof \YaMoney\Model\Confirmation\ConfirmationRedirect) {
+            if ($confirmation instanceof \YandexCheckout\Model\Confirmation\ConfirmationRedirect) {
                 $redirect = $confirmation->getConfirmationUrl();
             }
             $this->getOrderModel()->savePayment($order->order_id, $payment);
@@ -712,7 +712,7 @@ class pm_yandex_money extends PaymentRoot
                     die();
                 }
                 try {
-                    $notification = new \YaMoney\Model\Notification\NotificationWaitingForCapture($json);
+                    $notification = new \YandexCheckout\Model\Notification\NotificationWaitingForCapture($json);
                     $meta = $notification->getObject()->getMetadata();
                     if (empty($meta['order_id'])) {
                         $this->log('debug', 'Notification error: metadata order_id not exists');

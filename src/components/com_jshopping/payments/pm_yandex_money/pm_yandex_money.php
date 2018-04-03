@@ -7,6 +7,9 @@
  * @copyright Copyright (C) 2012-2017 YandexMoney. All rights reserved.
  */
 
+use YandexCheckout\Model\Notification\NotificationSucceeded;
+use YandexCheckout\Model\Notification\NotificationWaitingForCapture;
+
 defined('_JEXEC') or die('Restricted access');
 
 define('JSH_DIR', realpath(dirname(__FILE__).'/../..'));
@@ -509,8 +512,10 @@ class pm_yandex_money extends PaymentRoot
                     header('HTTP/1.1 400 Invalid body');
                     die();
                 }
-                $notification = new \YandexCheckout\Model\Notification\NotificationWaitingForCapture($json);
-                $payment      = $this->getKassaPaymentMethod($pmConfigs)->capturePayment($notification->getObject());
+                $notification = ($json['event'] === YandexCheckout\Model\NotificationEventType::PAYMENT_SUCCEEDED)
+                    ? new NotificationSucceeded($json)
+                    : new NotificationWaitingForCapture($json);
+                $payment = $this->getKassaPaymentMethod($pmConfigs)->capturePayment($notification->getObject());
                 if ($payment === null) {
                     $this->log('debug', 'Notification error: payment not exist');
                     header('HTTP/1.1 404 Payment not exists');
@@ -791,6 +796,7 @@ class pm_yandex_money extends PaymentRoot
             } elseif (isset($_GET['act']) && $_GET['act'] === 'notify') {
                 $this->log('debug', 'Notification callback check URL parameters');
                 $source = file_get_contents('php://input');
+                $this->log('debug', 'Notification body source: '.$source);
                 if (empty($source)) {
                     $this->log('debug', 'Notification error: body is empty');
                     header('HTTP/1.1 400 Body is empty');
@@ -803,7 +809,9 @@ class pm_yandex_money extends PaymentRoot
                     die();
                 }
                 try {
-                    $notification = new \YandexCheckout\Model\Notification\NotificationWaitingForCapture($json);
+                    $notification = ($json['event'] === YandexCheckout\Model\NotificationEventType::PAYMENT_SUCCEEDED)
+                        ? new NotificationSucceeded($json)
+                        : new NotificationWaitingForCapture($json);
                     $meta         = $notification->getObject()->getMetadata();
                     if (empty($meta['order_id'])) {
                         $this->log('debug', 'Notification error: metadata order_id not exists');

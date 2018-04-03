@@ -65,7 +65,7 @@ class KassaPaymentMethod
         try {
             $builder = CreatePaymentRequest::builder();
             $builder->setAmount($order->order_total)
-                ->setCapture(false)
+                ->setCapture(true)
                 ->setClientIp($_SERVER['REMOTE_ADDR'])
                 ->setMetadata(array(
                     'order_id'       => $order->order_id,

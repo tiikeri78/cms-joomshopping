@@ -22,6 +22,7 @@ if ($pmConfigs['paymode'] != '1') : ?>
             \YandexCheckout\Model\PaymentMethodType::SBERBANK       => 'SB',
             \YandexCheckout\Model\PaymentMethodType::ALFABANK       => 'AB',
             \YandexCheckout\Model\PaymentMethodType::QIWI           => 'QW',
+            \YandexCheckout\Model\PaymentMethodType::QIWI           => 'QW',
         );
         $num += 0;
         foreach ($listMethods as $long => $short) :

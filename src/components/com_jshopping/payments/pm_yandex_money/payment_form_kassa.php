@@ -9,6 +9,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+$cart_data = JSFactory::getModel('cart', 'jshop');
+$cart_data->load();
+
 if ($pmConfigs['paymode'] != '1') : ?>
 <table class="radio" style="margin-left: 50px;">
     <tbody>
@@ -22,7 +25,7 @@ if ($pmConfigs['paymode'] != '1') : ?>
             \YandexCheckout\Model\PaymentMethodType::SBERBANK       => 'SB',
             \YandexCheckout\Model\PaymentMethodType::ALFABANK       => 'AB',
             \YandexCheckout\Model\PaymentMethodType::QIWI           => 'QW',
-            \YandexCheckout\Model\PaymentMethodType::QIWI           => 'QW',
+            \YandexCheckout\Model\PaymentMethodType::INSTALLMENTS   => 'installments',
         );
         $num += 0;
         foreach ($listMethods as $long => $short) :
@@ -104,4 +107,24 @@ jQuery(document).ready(function () {
         }
     });
 });
+</script>
+<script src="https://static.yandex.net/kassa/pay-in-parts/ui/v1/"></script>
+<script type="text/javascript">
+    const ym_installments_shop_id = <?= $pmConfigs['shop_id'] ?>;
+    const ym_installments_total_amount = <?= $cart_data->price_product; ?>;
+    const ym_installments_language = "ru";
+
+    jQuery.get("https://money.yandex.ru/credit/order/ajax/credit-pre-schedule?shopId="
+        + ym_installments_shop_id + "&sum=" + ym_installments_total_amount, function (data) {
+        const ym_installments_amount_text = "<?= _JSHOP_YM_METHOD_INSTALLMENTS_AMOUNT; ?>";
+        if (ym_installments_amount_text && data && data.amount) {
+            jQuery('label[for=yandex_money_installments]').append(ym_installments_amount_text.replace('%s', data.amount));
+        }
+    });
+
+    const checkoutCreditUI = YandexCheckoutCreditUI({
+        shopId: ym_installments_shop_id,
+        sum: ym_installments_total_amount,
+        language: ym_installments_language
+    });
 </script>

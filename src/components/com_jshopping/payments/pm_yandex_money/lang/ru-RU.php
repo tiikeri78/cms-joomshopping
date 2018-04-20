@@ -53,6 +53,8 @@ define('_JSHOP_YM_METHOD_PB_DESCRIPTION', 'Интернет-банк Промс�
 define('_JSHOP_YM_METHOD_QIWI_DESCRIPTION', 'QIWI Wallet');
 define('_JSHOP_YM_METHOD_QP_DESCRIPTION', 'Доверительный платеж (Куппи.ру)');
 define('_JSHOP_YM_METHOD_MP_DESCRIPTION', 'Мобильный терминал');
+define('_JSHOP_YM_METHOD_INSTALLMENTS_DESCRIPTION', 'Заплатить по частям');
+define('_JSHOP_YM_METHOD_INSTALLMENTS_AMOUNT', ' (%s ₽ в месяц)');
 define('_JSHOP_YM_KASSA_MPOS_LABEL', 'Страница успеха для способа «Оплата картой при доставке»');
 define('_JSHOP_YM_KASSA_MPOS_HELP', 'Это страница с информацией о доставке. Укажите на ней, когда привезут товар и как его можно будет оплатить');
 

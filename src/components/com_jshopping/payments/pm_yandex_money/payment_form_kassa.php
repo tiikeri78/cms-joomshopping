@@ -66,7 +66,10 @@ if ($pmConfigs['paymode'] != '1') : ?>
     </tbody>
 </table>
 <?php else : ?>
-    <input type="hidden" name="params[pm_yandex_money][payment_type]" value="" />
+    <input type="hidden" name="params[pm_yandex_money][payment_type]" value="" id="pm_yandex_money_payment_type"/>
+    <?php if (isset($pmConfigs['ya_kassa_add_installments_button']) && $pmConfigs['ya_kassa_add_installments_button'] == '1') : ?>
+        <div class="ya_kassa_installments_button_container"></div>
+    <?php endif; ?>
 <?php endif; ?>
 <script type="text/javascript">
 function check_pm_yandex_money() {
@@ -126,5 +129,9 @@ jQuery(document).ready(function () {
         shopId: ym_installments_shop_id,
         sum: ym_installments_total_amount,
         language: ym_installments_language
+    });
+    const checkoutCreditButton = checkoutCreditUI({type: 'button', domSelector: '.ya_kassa_installments_button_container'});
+    checkoutCreditButton.on('click', function () {
+        jQuery('#pm_yandex_money_payment_type').val('installments');
     });
 </script>

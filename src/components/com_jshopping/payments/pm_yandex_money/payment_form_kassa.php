@@ -9,6 +9,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+const INSTALLMENTS_MIN_AMOUNT = 3000;
+
 $cart_data = JSFactory::getModel('cart', 'jshop');
 $cart_data->load();
 
@@ -30,6 +32,12 @@ if ($pmConfigs['paymode'] != '1') : ?>
         $num += 0;
         foreach ($listMethods as $long => $short) :
             if (isset($pmConfigs['method_' . $long]) && $pmConfigs['method_' . $long] == '1') :
+                if ($long === \YandexCheckout\Model\PaymentMethodType::INSTALLMENTS) {
+                    if (isset($cart_data->price_product)
+                        && ($cart_data->price_product < INSTALLMENTS_MIN_AMOUNT)) {
+                        continue;
+                    }
+                }
                 $num += 1; ?>
                 <tr class="highlight">
                     <td>

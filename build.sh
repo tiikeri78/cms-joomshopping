@@ -8,7 +8,7 @@ if [ -f "$ARCHIVE_FILE_NAME" ]; then
 fi;
 
 cd src
-zip -9 -r ../yandex-money-cms-v2-joomshopping.zip ./*
+"C:\Program Files\7-Zip\7z.exe" a -r "../yandex-money-cms-v2-joomshopping.zip" ./*
 
 cd ../
 rsync -av --delete src "$GIT_HUB_PROJECT_PATH";

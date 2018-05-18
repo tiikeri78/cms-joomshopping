@@ -50,7 +50,7 @@ define('_JSHOP_YM_KASSA_MPOS_LABEL', 'Success page for the Payment by Card on De
 define('_JSHOP_YM_KASSA_MPOS_HELP', 'This page contains delivery information. Specify the terms of the delivery and the payment here');
 
 
-define('_JSHOP_YM_MONEY_HEAD', 'To start operating the module, connect your store to <a target=\"_blank\" href=\"https://checkout.yandex.com/\">Yandex.Checkout</a>.');
+define('_JSHOP_YM_MONEY_HEAD', 'To start operating the module, connect your store to <a target="_blank" href="https://money.yandex.ru/">Yandex.Money</a>.');
 define('_JSHOP_YM_MONEY_ON', 'Enable payment acceptance to the Yandex.Money Wallet');
 define('_JSHOP_YM_MONEY_REDIRECT_HELP', "Copy this link to the Redirect URL field at the <a href='https://money.yandex.ru/myservices/online.xml' target='_blank'>notifications settings page</a>.");
 
@@ -172,3 +172,6 @@ define('_JSHOP_YM_LOG_VIEW_LABEL', 'View logs');
 define('_JSHOP_YM_CLEAR_LOGS', 'Clear logs');
 define('_JSHOP_YM_CLOSE', 'Close');
 define('_JSHOP_YM_LOGS_LABEL', 'Logs');
+
+define('_JSHOP_YM_TAB_UPDATE', 'Module update');
+

@@ -58,8 +58,8 @@ define('_JSHOP_YM_METHOD_INSTALLMENTS_AMOUNT', ' (%s ₽ в месяц)');
 define('_JSHOP_YM_KASSA_MPOS_LABEL', 'Страница успеха для способа «Оплата картой при доставке»');
 define('_JSHOP_YM_KASSA_MPOS_HELP', 'Это страница с информацией о доставке. Укажите на ней, когда привезут товар и как его можно будет оплатить');
 
-define('_JSHOP_YM_MONEY_HEAD', 'Для работы с модулем нужно <a href=\'https://money.yandex.ru/new\' target=\'_blank\'>открыть кошелек</a> на Яндексе и
-					<a href=\'https://sp-money.yandex.ru/myservices/online.xml\' target=\'_blank\'>зарегистрировать приложение</a> на сайте Яндекс.Денег');
+define('_JSHOP_YM_MONEY_HEAD', 'Для работы с модулем нужно <a href="https://money.yandex.ru/new" target="_blank">открыть кошелек</a> на Яндексе и
+					<a href="https://sp-money.yandex.ru/myservices/online.xml" target="_blank">зарегистрировать приложение</a> на сайте Яндекс.Денег');
 define('_JSHOP_YM_MONEY_ON', 'Включить прием платежей в кошелек на Яндексе');
 define('_JSHOP_YM_MONEY_REDIRECT_HELP', 'Скопируйте эту ссылку в поле Redirect URL на <a href=\'https://sp-money.yandex.ru/myservices/online.xml\' target=\'_blank\'>странице регистрации приложения</a>.');
 
@@ -183,4 +183,6 @@ define('_JSHOP_YM_LOG_VIEW_LABEL', 'Просмотр логов модуля');
 define('_JSHOP_YM_CLEAR_LOGS', 'Очистить журнал');
 define('_JSHOP_YM_CLOSE', 'Закрыть');
 define('_JSHOP_YM_LOGS_LABEL', 'Журнал сообщений модуля');
+
+define('_JSHOP_YM_TAB_UPDATE', 'Обновления');
 

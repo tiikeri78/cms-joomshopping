@@ -2,7 +2,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-echo JHtml::_('bootstrap.addTab', 'yamTab', 'updater-tab', 'Обновления');
+echo JHtml::_('bootstrap.addTab', 'yamTab', 'updater-tab', _JSHOP_YM_TAB_UPDATE);
 
 ?>
 

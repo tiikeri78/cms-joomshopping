@@ -174,6 +174,8 @@ echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
             </div>
         </div>
     </div>
+</div>
+<div class="row">
     <div class="span11 offset1">
         <div class="form-group">
             <div class="span2"><label for="pm_params-debug_log">Debug log</label></div>

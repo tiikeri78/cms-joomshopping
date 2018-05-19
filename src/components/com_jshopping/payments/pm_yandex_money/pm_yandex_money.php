@@ -590,7 +590,7 @@ class pm_yandex_money extends PaymentRoot
                     }
                 }
 
-                if ($payment->getStatus() === \YaMoney\Model\PaymentStatus::SUCCEEDED) {
+                if ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
                     $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' succeeded');
 
                     return array(

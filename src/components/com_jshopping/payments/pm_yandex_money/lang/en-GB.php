@@ -46,6 +46,9 @@ define('_JSHOP_YM_METHOD_MA_DESCRIPTION', 'MasterPass');
 define('_JSHOP_YM_METHOD_PB_DESCRIPTION', 'Promsvyazbank');
 define('_JSHOP_YM_METHOD_QIWI_DESCRIPTION', 'QIWI Wallet');
 define('_JSHOP_YM_METHOD_MP_DESCRIPTION', 'Mobile payment kiosk');
+define('_JSHOP_YM_METHOD_INSTALLMENTS_DESCRIPTION', 'Installments');
+define('_JSHOP_YM_METHOD_INSTALLMENTS_AMOUNT', ' (%s ₽ per month)');
+
 define('_JSHOP_YM_KASSA_MPOS_LABEL', 'Success page for the Payment by Card on Delivery method');
 define('_JSHOP_YM_KASSA_MPOS_HELP', 'This page contains delivery information. Specify the terms of the delivery and the payment here');
 

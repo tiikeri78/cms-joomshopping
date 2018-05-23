@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GIT_HUB_PROJECT_PATH=/home/agmolchanov/work/github/yandex-money-cms-v2-joomshopping
+GIT_HUB_PROJECT_PATH="$( cd "$(dirname "$0")" ; pwd )"
 ARCHIVE_FILE_NAME=yandex-money-cms-v2-joomshopping.zip
 
 if [ -f "$ARCHIVE_FILE_NAME" ]; then

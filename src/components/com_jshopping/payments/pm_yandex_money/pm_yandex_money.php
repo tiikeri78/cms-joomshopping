@@ -213,6 +213,7 @@ class pm_yandex_money extends PaymentRoot
             'page_mpos',
             'ya_kassa_description_template',
             'ya_kassa_send_check',
+            'ya_kassa_default_tax',
             'method_mp',
             'debug_log',
         );

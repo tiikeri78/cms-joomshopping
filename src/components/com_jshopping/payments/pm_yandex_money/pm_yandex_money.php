@@ -33,6 +33,7 @@ class pm_yandex_money extends PaymentRoot
     private $joomlaVersion;
     private $debugLog = true;
 
+    private $element = 'pm_yandex_money';
     private $repository = 'yandex-money/yandex-money-cms-v2-joomshopping';
     private $downloadDirectory = 'pm_yandex_money';
     private $backupDirectory = 'pm_yandex_money/backups';
@@ -148,6 +149,7 @@ class pm_yandex_money extends PaymentRoot
     public function showAdminFormParams($params)
     {
         $this->loadLanguageFile();
+        $this->installExtension();
 
         if (isset($_GET['subaction'])) {
 
@@ -1247,6 +1249,24 @@ class pm_yandex_money extends PaymentRoot
         }
 
         return true;
+    }
+
+    private function installExtension()
+    {
+        $addon = JTable::getInstance('addon', 'jshop');
+        $manifest = '{"creationDate":"20.07.2018","author":"YandexMoney","authorEmail":"cms@yamoney.ru","authorUrl":"https://kassa.yandex.ru","version":"'._JSHOP_YM_VERSION.'"}';
+        $addon->installJoomlaExtension(
+            array(
+                'name'           => 'YandexMoney',
+                'type'           => 'plugin',
+                'element'        => $this->element,
+                'folder'         => 'jshoppingadmin',
+                'client_id'      => 0,
+                'enabled'        => 1,
+                'access'         => 1,
+                'protected'      => 0,
+                'manifest_cache' => $manifest
+            ));
     }
 
     private function saveOrderHistory($order, $comments) {

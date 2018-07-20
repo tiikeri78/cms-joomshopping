@@ -574,25 +574,7 @@ class pm_yandex_money extends PaymentRoot
                     $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
                     $app         = JFactory::getApplication();
                     $app->redirect($redirectUrl);
-                }
-                if ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::CANCELED) {
-                    $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' is canceled');
-                    return array(4, 'Transaction is cancelled', $transactionId, _JSHOP_YM_CAPTURE_FAILED);
-                } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::PENDING) {
-                    $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' is pended');
-                    return array(2, _JSHOP_YM_WAITING_FOR_CAPTURE, $transactionId, _JSHOP_YM_WAITING_FOR_CAPTURE);
-                } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
-
-                    $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' wfc');
-                    $result = $this->getKassaPaymentMethod($pmConfigs)->capturePayment($payment);
-                    if ($result !== null) {
-                        $this->getOrderModel()->savePayment($order->order_id, $payment);
-                        $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' captured');
-                        $payment = $result;
-                    }
-                }
-
-                if ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
+                } else {
                     $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' succeeded');
 
                     return array(
@@ -601,10 +583,6 @@ class pm_yandex_money extends PaymentRoot
                         $transactionId,
                         _JSHOP_YM_PAYMENT_CAPTURED,
                     );
-                } else {
-                    $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' pended');
-
-                    return array(2, _JSHOP_YM_WAITING_FOR_CAPTURE, $transactionId, _JSHOP_YM_WAITING_FOR_CAPTURE);
                 }
             }
 

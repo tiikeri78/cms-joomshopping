@@ -9,6 +9,9 @@
 
 use YandexCheckout\Model\Notification\NotificationSucceeded;
 use YandexCheckout\Model\Notification\NotificationWaitingForCapture;
+use YandexCheckout\Model\NotificationEventType;
+use YandexCheckout\Model\PaymentMethodType;
+use YandexCheckout\Model\PaymentStatus;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -482,7 +485,6 @@ class pm_yandex_money extends PaymentRoot
     function checkTransaction($pmConfigs, $order, $act)
     {
         $this->mode = $this->getMode($pmConfigs);
-
         if ($this->mode === self::MODE_MONEY) {
             $this->ym_pay_mode = ($pmConfigs['paymode'] == '1');
             $this->ym_shopid   = $pmConfigs['shopid'];
@@ -510,15 +512,51 @@ class pm_yandex_money extends PaymentRoot
                     header('HTTP/1.1 400 Invalid body');
                     die();
                 }
-                $notification = ($json['event'] === YandexCheckout\Model\NotificationEventType::PAYMENT_SUCCEEDED)
+                $kassa = $this->getKassaPaymentMethod($pmConfigs);
+                $notification = ($json['event'] === NotificationEventType::PAYMENT_SUCCEEDED)
                     ? new NotificationSucceeded($json)
                     : new NotificationWaitingForCapture($json);
-                $payment = $this->getKassaPaymentMethod($pmConfigs)->capturePayment($notification->getObject());
-                if ($payment === null) {
+                $payment = $kassa->fetchPayment($notification->getObject()->getId());
+                if (!$payment) {
                     $this->log('debug', 'Notification error: payment not exist');
                     header('HTTP/1.1 404 Payment not exists');
                     die();
-                } elseif ($payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
+                }
+
+                if ($notification->getEvent() === NotificationEventType::PAYMENT_WAITING_FOR_CAPTURE
+                    && $payment->getStatus() === PaymentStatus::WAITING_FOR_CAPTURE
+                ) {
+                    if ($kassa->isEnableHoldMode()
+                        && $payment->getPaymentMethod()->getType() === PaymentMethodType::BANK_CARD
+                    ) {
+                        $this->log('info', 'Hold payment '.$payment->getId());
+                        try {
+                            /** @var jshopCheckout $checkout */
+                            $checkout             = JSFactory::getModel('checkout', 'jshop');
+                            $onHoldStatus         = $pmConfigs['ya_kassa_hold_mode_on_hold_status'];
+                            $order->order_created = 0;
+                            $order->order_status  = $onHoldStatus;
+                            $order->store();
+                            $checkout->changeStatusOrder($order->order_id, $onHoldStatus, 0);
+                            $this->saveOrderHistory($order, sprintf(_JSHOP_YM_HOLD_MODE_COMMENT_ON_HOLD,
+                                $payment->getExpiresAt()->format('d.m.Y H:i')));
+                            exit();
+                        } catch (Exception $e) {
+                            $this->log('debug', $e->getMessage());
+                            header('HTTP/1.1 500 Internal Server Error');
+                            die();
+                        }
+                    } else {
+                        $payment = $kassa->capturePayment($notification->getObject());
+                        if (!$payment || $payment->getStatus() !== PaymentStatus::SUCCEEDED) {
+                            $this->log('debug', 'Capture payment error');
+                            header('HTTP/1.1 400 Bad Request');
+                        }
+                        exit();
+                    }
+                }
+
+                if ($payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
                     $this->log('debug', 'Notification error: payment not exist 401');
                     header('HTTP/1.1 401 Payment not exists');
                     die();
@@ -1210,4 +1248,15 @@ class pm_yandex_money extends PaymentRoot
 
         return true;
     }
+
+    private function saveOrderHistory($order, $comments) {
+        $history = JSFactory::getTable('orderHistory', 'jshop');
+        $history->order_id = $order->order_id;
+        $history->order_status_id = $order->order_status;
+        $history->status_date_added = getJsDate();
+        $history->customer_notify = 0;
+        $history->comments = $comments;
+        return $history->store();
+    }
+
 }

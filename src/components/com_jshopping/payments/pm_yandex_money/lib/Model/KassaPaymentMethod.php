@@ -22,6 +22,7 @@ class KassaPaymentMethod
     private $taxRates;
     private $sendReceipt;
     private $descriptionTemplate;
+    private $isEnableHoldMode;
 
     /**
      * KassaPaymentMethod constructor.
@@ -51,6 +52,7 @@ class KassaPaymentMethod
         }
 
         $this->sendReceipt = isset($pmConfig['ya_kassa_send_check']) && $pmConfig['ya_kassa_send_check'] == '1';
+        $this->isEnableHoldMode = isset($pmConfig['ya_kassa_enable_hold_mode']) && $pmConfig['ya_kassa_enable_hold_mode'] == '1';
     }
 
     public function getShopId()
@@ -75,9 +77,10 @@ class KassaPaymentMethod
     public function createPayment($order, $cart, $returnUrl)
     {
         try {
+            $params  = unserialize($order->payment_params_data);
             $builder = CreatePaymentRequest::builder();
             $builder->setAmount($order->order_total)
-                ->setCapture(true)
+                ->setCapture($this->getCaptureValue($params['payment_type']))
                 ->setClientIp($_SERVER['REMOTE_ADDR'])
                 ->setDescription($this->createDescription($order))
                 ->setMetadata(array(
@@ -90,7 +93,6 @@ class KassaPaymentMethod
                 'type' => ConfirmationType::REDIRECT,
                 'returnUrl' => $returnUrl,
             );
-            $params = unserialize($order->payment_params_data);
             if (!empty($params['payment_type'])) {
                 $paymentType = $params['payment_type'];
                 if ($paymentType === PaymentMethodType::ALFABANK) {
@@ -144,45 +146,18 @@ class KassaPaymentMethod
     }
 
     /**
-     * @param PaymentInterface $notificationPayment
-     * @param bool $fetchPayment
+     * @param PaymentInterface $payment
      * @return PaymentInterface|null
      */
-    public function capturePayment($notificationPayment, $fetchPayment = true)
+    public function capturePayment($payment)
     {
-        if ($fetchPayment) {
-            $payment = $this->fetchPayment($notificationPayment->getId());
-        } else {
-            $payment = $notificationPayment;
-        }
-        if ($payment->getStatus() !== PaymentStatus::WAITING_FOR_CAPTURE) {
-            return $payment->getStatus() === PaymentStatus::SUCCEEDED ? $payment : null;
-        }
-
         try {
             $builder = CreateCaptureRequest::builder();
             $builder->setAmount($payment->getAmount());
             $request = $builder->build();
+            $response = $this->getClient()->capturePayment($request, $payment->getId());
         } catch (\Exception $e) {
             $this->module->log('error', 'Failed to create capture payment: ' . $e->getMessage());
-            return null;
-        }
-
-        try {
-            $tries = 0;
-            $key = uniqid('', true);
-            do {
-                $response = $this->getClient()->capturePayment($request, $payment->getId(), $key);
-                if ($response === null) {
-                    $tries++;
-                    if ($tries > 3) {
-                        break;
-                    }
-                    sleep(2);
-                }
-            } while ($response === null);
-        } catch (\Exception $e) {
-            $this->module->log('error', 'Failed to capture payment: ' . $e->getMessage());
             return null;
         }
 
@@ -290,4 +265,26 @@ class KassaPaymentMethod
 
         return (string)mb_substr($description, 0, Payment::MAX_LENGTH_DESCRIPTION);
     }
+
+    /**
+     * @return bool
+     */
+    public function isEnableHoldMode()
+    {
+        return $this->isEnableHoldMode;
+    }
+
+    /**
+     * @param string $paymentMethod
+     * @return bool
+     */
+    private function getCaptureValue($paymentMethod)
+    {
+        if (!$this->isEnableHoldMode()) {
+            return true;
+        }
+
+        return !in_array($paymentMethod, array('', PaymentMethodType::BANK_CARD));
+    }
+
 }

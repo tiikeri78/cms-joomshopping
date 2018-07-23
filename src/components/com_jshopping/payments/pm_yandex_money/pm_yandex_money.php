@@ -542,11 +542,9 @@ class pm_yandex_money extends PaymentRoot
                             $checkout->changeStatusOrder($order->order_id, $onHoldStatus, 0);
                             $this->saveOrderHistory($order, sprintf(_JSHOP_YM_HOLD_MODE_COMMENT_ON_HOLD,
                                 $payment->getExpiresAt()->format('d.m.Y H:i')));
-                            exit();
                         } catch (Exception $e) {
                             $this->log('debug', $e->getMessage());
                             header('HTTP/1.1 500 Internal Server Error');
-                            die();
                         }
                     } else {
                         $payment = $kassa->capturePayment($notification->getObject());
@@ -554,47 +552,45 @@ class pm_yandex_money extends PaymentRoot
                             $this->log('debug', 'Capture payment error');
                             header('HTTP/1.1 400 Bad Request');
                         }
-                        exit();
                     }
+                    exit();
                 }
 
-                if ($payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
-                    $this->log('debug', 'Notification error: payment not exist 401');
-                    header('HTTP/1.1 401 Payment not exists');
-                    die();
+                if ($notification->getEvent() === NotificationEventType::PAYMENT_SUCCEEDED
+                    && $payment->getStatus() === PaymentStatus::SUCCEEDED
+                ) {
+                    try {
+                        $jshopConfig = JSFactory::getConfig();
+
+                        /** @var jshopCheckout $checkout */
+                        $checkout             = JSFactory::getModel('checkout', 'jshop');
+                        $endStatus            = $pmConfigs['transaction_end_status'];
+                        $order->order_created = 1;
+                        $order->order_status  = $endStatus;
+                        $order->store();
+                        if ($jshopConfig->send_order_email) {
+                            $checkout->sendOrderEmail($order->order_id);
+                        }
+                        if ($jshopConfig->order_stock_removed_only_paid_status) {
+                            $product_stock_removed = in_array($endStatus,
+                                $jshopConfig->payment_status_enable_download_sale_file);
+                        } else {
+                            $product_stock_removed = 1;
+                        }
+                        if ($product_stock_removed) {
+                            $order->changeProductQTYinStock("-");
+                        }
+                        $checkout->changeStatusOrder($order->order_id, $endStatus, 0);
+                    } catch (Exception $e) {
+                        $this->log('debug', $e->getMessage());
+                        header('HTTP/1.1 500 Internal Server Error');
+                    }
+                    exit();
                 }
-                try {
-                    $jshopConfig = JSFactory::getConfig();
 
-                    /** @var jshopCheckout $checkout */
-                    $checkout             = JSFactory::getModel('checkout', 'jshop');
-                    $endStatus            = $pmConfigs['transaction_end_status'];
-                    $order->order_created = 1;
-                    $order->order_status  = $endStatus;
-                    $order->store();
-                    if ($jshopConfig->send_order_email) {
-                        $checkout->sendOrderEmail($order->order_id);
-                    }
-                    if ($jshopConfig->order_stock_removed_only_paid_status) {
-                        $product_stock_removed = in_array($endStatus,
-                            $jshopConfig->payment_status_enable_download_sale_file);
-                    } else {
-                        $product_stock_removed = 1;
-                    }
-                    if ($product_stock_removed) {
-                        $order->changeProductQTYinStock("-");
-                    }
-                    $checkout->changeStatusOrder($order->order_id, $endStatus, 0);
-                } catch (Exception $e) {
-                    $this->log('debug', $e->getMessage());
-                    header('HTTP/1.1 500 Internal Server Error');
-                    die();
-                }
-
-
-                echo '{"success":true,"payment_status":"'.$payment->getStatus().'"}';
-                die();
-
+                $this->log('debug', 'Notification error: wrong payment status');
+                header('HTTP/1.1 401 Payment not exists');
+                exit();
             } else {
                 $this->log('debug', 'Check transaction for order#'.$order->order_id);
                 $transactionId = $this->getOrderModel()->getPaymentIdByOrderId($order->order_id);
@@ -1014,7 +1010,7 @@ class pm_yandex_money extends PaymentRoot
         return $this->orderModel;
     }
 
-    private function getKassaPaymentMethod($pmConfigs)
+    public function getKassaPaymentMethod($pmConfigs)
     {
         $this->loadLanguageFile();
         if ($this->kassa === null) {

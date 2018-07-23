@@ -10,6 +10,7 @@ use YandexCheckout\Model\PaymentInterface;
 use YandexCheckout\Model\PaymentMethodType;
 use YandexCheckout\Request\Payments\CreatePaymentRequest;
 use YandexCheckout\Request\Payments\Payment\CreateCaptureRequest;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureRequestBuilder;
 
 class KassaPaymentMethod
 {
@@ -112,7 +113,7 @@ class KassaPaymentMethod
 
             $receipt = null;
             if (count($cart->products) && $this->sendReceipt) {
-                $this->factoryReceipt($builder, $cart, $order);
+                $this->factoryReceipt($builder, $cart->products, $order);
             }
 
             $request = $builder->build();
@@ -125,18 +126,7 @@ class KassaPaymentMethod
         }
 
         try {
-            $tries = 0;
-            $key = uniqid('', true);
-            do {
-                $payment = $this->getClient()->createPayment($request, $key);
-                if ($payment === null) {
-                    $tries++;
-                    if ($tries > 3) {
-                        break;
-                    }
-                    sleep(2);
-                }
-            } while ($payment === null);
+            $payment = $this->getClient()->createPayment($request);
         } catch (\Exception $e) {
             $this->module->log('error', 'Failed to create payment: ' . $e->getMessage());
             return null;
@@ -179,11 +169,11 @@ class KassaPaymentMethod
     }
 
     /**
-     * @param \YandexCheckout\Request\Payments\CreatePaymentRequestBuilder $builder
-     * @param $cart
+     * @param \YandexCheckout\Request\Payments\CreatePaymentRequestBuilder|CreateCaptureRequestBuilder $builder
+     * @param array $products
      * @param $order
      */
-    private function factoryReceipt($builder, $cart, $order)
+    public function factoryReceipt($builder, $products, $order)
     {
         $shippingModel = \JSFactory::getTable('shippingMethod', 'jshop');
         $shippingMethods = $shippingModel->getAllShippingMethodsCountry($order->d_country, $order->payment_method_id);
@@ -197,10 +187,11 @@ class KassaPaymentMethod
         foreach ($shippingMethods as $tmp) {
             if ($tmp->shipping_id == $order->shipping_method_id) {
                 $shipping = $tmp;
+                break;
             }
         }
 
-        foreach ($cart->products as $product) {
+        foreach ($products as $product) {
             if (isset($product['tax_id']) && !empty($this->taxRates[$product['tax_id']])) {
                 $taxId = $this->taxRates[$product['tax_id']];
                 $builder->addReceiptItem($product['product_name'], $product['price'], $product['quantity'], $taxId);
@@ -222,7 +213,7 @@ class KassaPaymentMethod
     /**
      * @return Client
      */
-    private function getClient()
+    public function getClient()
     {
         if ($this->client === null) {
             $this->client = new Client();
@@ -284,6 +275,14 @@ class KassaPaymentMethod
         }
 
         return !in_array($paymentMethod, array('', PaymentMethodType::BANK_CARD));
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSendReceipt()
+    {
+        return $this->sendReceipt;
     }
 
 }

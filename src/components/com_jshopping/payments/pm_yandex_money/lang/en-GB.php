@@ -44,6 +44,10 @@ define('_JSHOP_YM_HOLD_MODE_ON_HOLD_STATUS_HELP', 'the order status will be chan
 define('_JSHOP_YM_HOLD_MODE_CANCEL_STATUS', 'canceled');
 define('_JSHOP_YM_HOLD_MODE_CANCEL_STATUS_HELP', 'the order status will be changed to this one after the payment is canceled');
 define('_JSHOP_YM_HOLD_MODE_COMMENT_ON_HOLD', 'Поступил новый платёж. Он ожидает подтверждения до %1$s, после чего автоматически отменится');
+define('_JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_SUCCESS', 'Вы подтвердили платёж в Яндекс.Кассе.');
+define('_JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_FAIL', 'Платёж не подтвердился. Попробуйте ещё раз.');
+define('_JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_SUCCESS', 'Вы отменили платёж в Яндекс.Кассе. Деньги вернутся клиенту.');
+define('_JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_FAIL', 'Платёж не отменился. Попробуйте ещё раз.');
 define('_JSHOP_YM_DESCRIPTION_HELP', 'Full description of the transaction that the user will see during the checkout process. You can find it in your Yandex.Checkout Merchant Profile. For example, "Payment for order No. 72 by user@yandex.ru". Limitations: no more than 128 symbols.');
 define('_JSHOP_YM_METHOD_YANDEX_MONEY_DESCRIPTION', 'Yandex.Money');
 define('_JSHOP_YM_METHOD_CARDS_DESCRIPTION', 'Bank cards');

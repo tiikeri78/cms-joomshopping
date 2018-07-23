@@ -1265,7 +1265,7 @@ class pm_yandex_money extends PaymentRoot
             ));
     }
 
-    private function saveOrderHistory($order, $comments) {
+    public function saveOrderHistory($order, $comments) {
         $history = JSFactory::getTable('orderHistory', 'jshop');
         $history->order_id = $order->order_id;
         $history->order_status_id = $order->order_status;

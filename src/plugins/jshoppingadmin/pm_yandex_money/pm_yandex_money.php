@@ -1,5 +1,8 @@
 <?php
 
+use YandexCheckout\Model\PaymentStatus;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureRequest;
+
 defined('_JEXEC') or die('Restricted access');
 
 include dirname(__FILE__).'/../../../components/com_jshopping/payments/pm_yandex_money/pm_yandex_money.php';
@@ -29,7 +32,7 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
         $pmconfig    = $parseString->parseStringToParams();
 
         $pm_yandex_money = new pm_yandex_money();
-        $kassa = $pm_yandex_money->getKassaPaymentMethod($pmconfig);
+        $kassa           = $pm_yandex_money->getKassaPaymentMethod($pmconfig);
         if (!$kassa->isEnableHoldMode()) {
             return;
         }
@@ -54,11 +57,46 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
         }
 
         if ($status === $completeStatus) {
-            $status = $onHoldStatus;
+            $apiClient = $kassa->getClient();
+            $payment   = $apiClient->getPaymentInfo($order->transaction);
+            try {
+                $builder = CreateCaptureRequest::builder();
+                $builder->setAmount($order->order_total);
+
+                if ($kassa->isSendReceipt()) {
+                    $kassa->factoryReceipt($builder, $order->getAllItems(), $order);
+                }
+
+                $request = $builder->build();
+                $payment = $apiClient->capturePayment($request, $payment->getId());
+            } catch (\Exception $e) {
+                $pm_yandex_money->log('error', 'Capture error: '.$e->getMessage());
+            }
+
+            if (!$payment || $payment->getStatus() !== PaymentStatus::SUCCEEDED) {
+                $status = $onHoldStatus;
+                $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_FAIL);
+                $pm_yandex_money->log('error', 'Capture payment error: capture failed');
+                return;
+            }
+            $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_SUCCESS);
         }
 
         if ($status === $cancelStatus) {
-            $status = $onHoldStatus;
+            $apiClient = $kassa->getClient();
+            $payment   = null;
+            try {
+                $payment = $apiClient->cancelPayment($order->transaction);
+            } catch (\Exception $e) {
+                $pm_yandex_money->log('error', 'Capture error: '.$e->getMessage());
+            }
+            if (!$payment || $payment->getStatus() !== PaymentStatus::CANCELED) {
+                $status = $onHoldStatus;
+                $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_FAIL);
+                $pm_yandex_money->log('error', 'Cancel payment error: cancel failed');
+                return;
+            }
+            $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_SUCCESS);
         }
     }
 }

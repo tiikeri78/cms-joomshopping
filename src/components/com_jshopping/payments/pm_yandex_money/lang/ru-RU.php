@@ -47,6 +47,10 @@ define('_JSHOP_YM_HOLD_MODE_ON_HOLD_STATUS_HELP', 'заказ переходит
 define('_JSHOP_YM_HOLD_MODE_CANCEL_STATUS', 'отменён');
 define('_JSHOP_YM_HOLD_MODE_CANCEL_STATUS_HELP', 'заказ переходит в этот статус после отмены платежа');
 define('_JSHOP_YM_HOLD_MODE_COMMENT_ON_HOLD', 'Поступил новый платёж. Он ожидает подтверждения до %1$s, после чего автоматически отменится');
+define('_JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_SUCCESS', 'Вы подтвердили платёж в Яндекс.Кассе.');
+define('_JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_FAIL', 'Платёж не подтвердился. Попробуйте ещё раз.');
+define('_JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_SUCCESS', 'Вы отменили платёж в Яндекс.Кассе. Деньги вернутся клиенту.');
+define('_JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_FAIL', 'Платёж не отменился. Попробуйте ещё раз.');
 define('_JSHOP_YM_KASSA_PAYMODE_KASSA', 'На стороне Кассы');
 define('_JSHOP_YM_KASSA_PAYMODE_SHOP', 'На стороне магазина');
 define('_JSHOP_YM_KASSA_PAYMODE_LINK', '<a href=\'https://tech.yandex.ru/money/doc/payment-solution/payment-form/payment-form-docpage/\' target=\'_blank\'>Подробнее о сценариях оплаты</a>');

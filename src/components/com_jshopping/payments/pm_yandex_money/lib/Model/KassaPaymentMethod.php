@@ -8,7 +8,6 @@ use YandexCheckout\Model\ConfirmationType;
 use YandexCheckout\Model\Payment;
 use YandexCheckout\Model\PaymentInterface;
 use YandexCheckout\Model\PaymentMethodType;
-use YandexCheckout\Model\PaymentStatus;
 use YandexCheckout\Request\Payments\CreatePaymentRequest;
 use YandexCheckout\Request\Payments\Payment\CreateCaptureRequest;
 

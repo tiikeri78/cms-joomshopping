@@ -1022,7 +1022,7 @@ class pm_yandex_money extends PaymentRoot
 
     private function getLogFileName()
     {
-        return realpath(JSH_DIR.'/log/pm_yandex_money.log');
+        return realpath(JSH_DIR).'/log/pm_yandex_money.log';
     }
 
     public function checkModuleVersion($useCache = true)

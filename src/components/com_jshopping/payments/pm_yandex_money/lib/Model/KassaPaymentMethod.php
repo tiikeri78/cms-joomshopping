@@ -191,12 +191,28 @@ class KassaPaymentMethod
             }
         }
 
+        $allTaxes = \JSFactory::getModel("taxes")->getAllTaxes();
         foreach ($products as $product) {
-            if (isset($product['tax_id']) && !empty($this->taxRates[$product['tax_id']])) {
-                $taxId = $this->taxRates[$product['tax_id']];
+            if (is_array($product)) {
+                if (isset($product['tax_id']) && !empty($this->taxRates[$product['tax_id']])) {
+                    $taxId = $this->taxRates[$product['tax_id']];
+                } else {
+                    $taxId = $defaultTaxRate;
+                }
                 $builder->addReceiptItem($product['product_name'], $product['price'], $product['quantity'], $taxId);
-            } else {
-                $builder->addReceiptItem($product['product_name'], $product['price'], $product['quantity'], $defaultTaxRate);
+            } elseif (is_object($product)) {
+                $taxId = $defaultTaxRate;
+                $suitableTaxes = array_filter($allTaxes, function($tax) use ($product) {
+                    return $product->product_tax == $tax->tax_value;
+                });
+                if (!empty($suitableTaxes)) {
+                    $suitableTax = reset($suitableTaxes);
+                    if (!empty($this->taxRates[$suitableTax->tax_id])) {
+                        $taxId = $this->taxRates[$suitableTax->tax_id];
+                    }
+                }
+                $builder->addReceiptItem($product->product_name, $product->product_item_price,
+                    $product->product_quantity, $taxId);
             }
         }
 

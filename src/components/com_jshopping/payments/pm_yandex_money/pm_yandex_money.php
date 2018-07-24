@@ -536,7 +536,7 @@ class pm_yandex_money extends PaymentRoot
                             /** @var jshopCheckout $checkout */
                             $checkout             = JSFactory::getModel('checkout', 'jshop');
                             $onHoldStatus         = $pmConfigs['ya_kassa_hold_mode_on_hold_status'];
-                            $order->order_created = 0;
+                            $order->order_created = 1;
                             $order->order_status  = $onHoldStatus;
                             $order->store();
                             $checkout->changeStatusOrder($order->order_id, $onHoldStatus, 0);
@@ -611,10 +611,10 @@ class pm_yandex_money extends PaymentRoot
                     $app         = JFactory::getApplication();
                     $app->redirect($redirectUrl);
                 } else {
-                    $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' succeeded');
+                    $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' paid');
 
                     return array(
-                        1,
+                        -1,
                         sprintf(_JSHOP_YM_PAYMENT_CAPTURED_TEXT, $transactionId),
                         $transactionId,
                         _JSHOP_YM_PAYMENT_CAPTURED,

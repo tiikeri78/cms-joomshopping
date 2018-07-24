@@ -191,7 +191,8 @@ class KassaPaymentMethod
             }
         }
 
-        $allTaxes = \JSFactory::getModel("taxes")->getAllTaxes();
+        $moduleTaxes = \JSFactory::getModel("taxes");
+        $allTaxes = $moduleTaxes ? $moduleTaxes->getAllTaxes() : array();
         foreach ($products as $product) {
             if (is_array($product)) {
                 if (isset($product['tax_id']) && !empty($this->taxRates[$product['tax_id']])) {

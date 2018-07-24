@@ -79,6 +79,7 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
                 $pm_yandex_money->log('error', 'Capture payment error: capture failed');
                 return;
             }
+            $order->order_status = $completeStatus;
             $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_SUCCESS);
         }
 
@@ -96,6 +97,7 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
                 $pm_yandex_money->log('error', 'Cancel payment error: cancel failed');
                 return;
             }
+            $order->order_status = $cancelStatus;
             $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_SUCCESS);
         }
     }

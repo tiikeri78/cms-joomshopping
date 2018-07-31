@@ -1001,7 +1001,7 @@ class pm_yandex_money extends PaymentRoot
     /**
      * @return \YandexMoney\Model\OrderModel
      */
-    private function getOrderModel()
+    public function getOrderModel()
     {
         if ($this->orderModel === null) {
             $this->orderModel = new \YandexMoney\Model\OrderModel();

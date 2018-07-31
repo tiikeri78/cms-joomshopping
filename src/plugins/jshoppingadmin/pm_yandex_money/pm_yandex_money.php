@@ -58,7 +58,7 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
 
         if ($status === $completeStatus) {
             $apiClient = $kassa->getClient();
-            $payment   = $apiClient->getPaymentInfo($order->transaction);
+            $payment   = $apiClient->getPaymentInfo($pm_yandex_money->getOrderModel()->getPaymentIdByOrderId($order->order_id));
             try {
                 $builder = CreateCaptureRequest::builder();
                 $builder->setAmount($order->order_total);

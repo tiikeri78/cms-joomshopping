@@ -125,7 +125,7 @@ class pm_yandex_money_sbbol extends PaymentRoot
             $params = array();
         }
 
-        if (isset($params['sbbol_purpose']) && empty($params['sbbol_purpose'])) {
+        if (!isset($params['sbbol_purpose']) || empty($params['sbbol_purpose'])) {
             $params['sbbol_purpose'] = 'Оплата заказа %order_id%';
         }
 

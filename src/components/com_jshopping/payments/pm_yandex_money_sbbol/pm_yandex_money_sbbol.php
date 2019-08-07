@@ -229,7 +229,7 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $app->redirect($redirect);
     }
 
-    public function getUrlParams()
+    public function getUrlParams($pmConfigs)
     {
         $params = array();
         if ($_POST['orderNumber']) {

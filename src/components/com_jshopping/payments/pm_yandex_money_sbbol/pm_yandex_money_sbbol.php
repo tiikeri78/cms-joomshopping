@@ -24,11 +24,6 @@ require_once dirname(__FILE__).'/SbbolException.php';
 
 class pm_yandex_money_sbbol extends PaymentRoot
 {
-    const MODE_OFF = 0;
-    const MODE_KASSA = 1;
-    const MODE_MONEY = 2;
-    const MODE_PAYMENTS = 3;
-    
     private $orderModel;
     private $kassa;
     private $mode = -1;
@@ -96,14 +91,8 @@ class pm_yandex_money_sbbol extends PaymentRoot
 
     public function getDisplayNameParams()
     {
+        //@todo рассмотреть возможность убрать данный метод.
         $names      = array();
-        $this->mode = $this->getMode($this->getParams());
-        if ($this->mode == self::MODE_PAYMENTS) {
-            $names = array(
-                'ya_payments_fio' => _JSHOP_YM_PAYMENTS_FIO_LABEL,
-            );
-        }
-
         return $names;
     }
 
@@ -240,14 +229,8 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $app->redirect($redirect);
     }
 
-    public function getUrlParams($pmconfigs)
+    public function getUrlParams()
     {
-        $this->mode = $this->getMode($pmconfigs);
-        if ($this->mode == self::MODE_KASSA && $_POST['paymentType'] == 'MP' && $this->checkSign($_POST)) {
-            $this->ym_shopid = $pmconfigs['shopid'];
-            $this->sendCode($_POST, '0');
-            die();
-        }
         $params = array();
         if ($_POST['orderNumber']) {
             $params['order_id'] = (int)$_POST['module_order_id'];
@@ -258,25 +241,6 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $params['checkHash'] = 0;
 
         return $params;
-    }
-
-    private function getMode($paymentConfig)
-    {
-        if ($this->mode == -1) {
-            $this->mode = self::MODE_OFF;
-            if ($paymentConfig['kassamode'] == '1') {
-                $this->mode        = self::MODE_KASSA;
-                $this->ym_password = $paymentConfig['shoppassword'];
-            } elseif ($paymentConfig['moneymode'] == '1') {
-                $this->mode        = self::MODE_MONEY;
-                $this->ym_password = $paymentConfig['password'];
-            } elseif (isset($paymentConfig['paymentsmode']) && $paymentConfig['paymentsmode'] == '1') {
-                $this->mode = self::MODE_PAYMENTS;
-            }
-            $this->debugLog = isset($paymentConfig['debug_log']) && $paymentConfig['debug_log'] == '1';
-        }
-
-        return $this->mode;
     }
 
     /**

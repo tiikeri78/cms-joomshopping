@@ -24,8 +24,14 @@ require_once dirname(__FILE__).'/SbbolException.php';
 
 class pm_yandex_money_sbbol extends PaymentRoot
 {
+    const MODE_OFF = 0;
+    const MODE_KASSA = 1;
+    const MODE_MONEY = 2;
+    const MODE_PAYMENTS = 3;
+    
     private $orderModel;
     private $kassa;
+    private $mode = -1;
 
     public function __construct()
     {
@@ -205,7 +211,7 @@ class pm_yandex_money_sbbol extends PaymentRoot
 
 
         $redirectUrl = $uri->toString(array('scheme', 'host', 'port'))
-                       .SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money&no_lang=1&order_id=".$order->order_id);
+            .SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money&no_lang=1&order_id=".$order->order_id);
         $redirectUrl = htmlspecialchars_decode($redirectUrl);
         try {
             $payment = $this->getKassaPaymentMethod($pmconfigs)->createSbbolPayment($order, $cart, $redirectUrl);
@@ -252,6 +258,25 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $params['checkHash'] = 0;
 
         return $params;
+    }
+
+    private function getMode($paymentConfig)
+    {
+        if ($this->mode == -1) {
+            $this->mode = self::MODE_OFF;
+            if ($paymentConfig['kassamode'] == '1') {
+                $this->mode        = self::MODE_KASSA;
+                $this->ym_password = $paymentConfig['shoppassword'];
+            } elseif ($paymentConfig['moneymode'] == '1') {
+                $this->mode        = self::MODE_MONEY;
+                $this->ym_password = $paymentConfig['password'];
+            } elseif (isset($paymentConfig['paymentsmode']) && $paymentConfig['paymentsmode'] == '1') {
+                $this->mode = self::MODE_PAYMENTS;
+            }
+            $this->debugLog = isset($paymentConfig['debug_log']) && $paymentConfig['debug_log'] == '1';
+        }
+
+        return $this->mode;
     }
 
     /**
@@ -448,7 +473,7 @@ class pm_yandex_money_sbbol extends PaymentRoot
     {
         $uri         = JURI::getInstance();
         $redirectUrl = $uri->toString(array('scheme', 'host', 'port'))
-                       .SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money_sbbol&no_lang=1&order_id=".$order->order_id);
+            .SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money_sbbol&no_lang=1&order_id=".$order->order_id);
         $redirectUrl = htmlspecialchars_decode($redirectUrl);
 
         return $redirectUrl;

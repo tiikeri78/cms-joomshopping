@@ -120,7 +120,12 @@ class pm_yandex_money_sbbol extends PaymentRoot
             'ya_sbbol_default_tax',
             'sbbol_purpose',
         );
-        if (empty($params['sbbol_purpose'])) {
+
+        if (!is_array($params)) {
+            $params = array();
+        }
+
+        if (isset($params['sbbol_purpose']) && empty($params['sbbol_purpose'])) {
             $params['sbbol_purpose'] = 'Оплата заказа %order_id%';
         }
 

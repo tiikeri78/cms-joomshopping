@@ -256,6 +256,10 @@ class pm_yandex_money extends PaymentRoot
             PaymentSubject::ANOTHER               => 'Другое ('.PaymentSubject::ANOTHER.')',
         );
 
+        if (!is_array($params)) {
+            $params = array();
+        }
+
         $params['paymentModeEnum']    = $paymentModeEnum;
         $params['paymentSubjectEnum'] = $paymentSubjectEnum;
 
@@ -265,9 +269,6 @@ class pm_yandex_money extends PaymentRoot
             $array_params[] = 'ya_kassa_tax_'.$k;
         }
 
-        if (!is_array($params)) {
-            $params = array();
-        }
         foreach ($array_params as $key) {
             if (!isset($params[$key])) {
                 $params[$key] = '';

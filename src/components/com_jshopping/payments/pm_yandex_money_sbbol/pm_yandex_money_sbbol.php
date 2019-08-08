@@ -103,6 +103,10 @@ class pm_yandex_money_sbbol extends PaymentRoot
 
     /**
      * function call in admin
+     *
+     * @param string|array $params
+     * @return void
+     *
      */
     public function showAdminFormParams($params)
     {

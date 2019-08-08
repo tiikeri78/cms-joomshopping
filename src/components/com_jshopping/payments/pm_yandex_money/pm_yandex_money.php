@@ -148,6 +148,8 @@ class pm_yandex_money extends PaymentRoot
      * function call in admin
      *
      * @param string|array $params
+     * @return void
+     *
      */
     public function showAdminFormParams($params)
     {

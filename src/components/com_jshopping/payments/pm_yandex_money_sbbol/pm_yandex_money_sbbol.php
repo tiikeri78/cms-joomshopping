@@ -229,16 +229,18 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $app->redirect($redirect);
     }
 
-    public function getUrlParams($pmConfigs)
+    public function getUrlParams()
     {
-        $params = array();
+        $params = array(
+            "hash"      => "",
+            "checkHash" => 0,
+        );
+
         if ($_POST['orderNumber']) {
             $params['order_id'] = (int)$_POST['module_order_id'];
         } else {
             $params['order_id'] = (int)$_POST['label'];
         }
-        $params['hash']      = "";
-        $params['checkHash'] = 0;
 
         return $params;
     }

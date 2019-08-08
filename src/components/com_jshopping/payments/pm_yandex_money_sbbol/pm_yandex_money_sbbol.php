@@ -26,7 +26,6 @@ class pm_yandex_money_sbbol extends PaymentRoot
 {
     private $orderModel;
     private $kassa;
-    private $mode = -1;
 
     public function __construct()
     {
@@ -91,9 +90,7 @@ class pm_yandex_money_sbbol extends PaymentRoot
 
     public function getDisplayNameParams()
     {
-        //@todo рассмотреть возможность убрать данный метод.
-        $names      = array();
-        return $names;
+        return array();
     }
 
     /**

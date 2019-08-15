@@ -183,6 +183,15 @@ class pm_yandex_money_sbbol extends PaymentRoot
      */
     function showEndForm($pmconfigs, $order)
     {
+        if (!isset($pmConfigs['paymode'])) {
+            $this->log('error', 'Please activate payment method');
+            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
+            JError::raiseWarning('', _JSHOP_ERROR_PAYMENT);
+            $app         = JFactory::getApplication();
+
+            $app->redirect($redirectUrl);
+        }
+
         $this->ym_test_mode = $pmconfigs['testmode'];
         $this->ym_pay_mode  = ($pmconfigs['paymode'] == '1');
 

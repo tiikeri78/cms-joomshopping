@@ -244,7 +244,7 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $app->redirect($redirect);
     }
 
-    public function getUrlParams()
+    public function getUrlParams($pmconfigs)
     {
         $params = array(
             "hash"      => "",

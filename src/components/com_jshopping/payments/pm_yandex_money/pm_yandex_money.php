@@ -64,6 +64,7 @@ class pm_yandex_money extends PaymentRoot
     {
         $this->loadLanguageFile();
         $this->mode = $this->getMode($pmConfigs);
+
         if ($this->mode === self::MODE_KASSA) {
             include(dirname(__FILE__)."/payment_form_kassa.php");
         } else {
@@ -95,7 +96,14 @@ class pm_yandex_money extends PaymentRoot
     public function checkPaymentInfo($params, $pmConfigs)
     {
         $this->mode = $this->getMode($pmConfigs);
-        if ($this->mode == self::MODE_PAYMENTS) {
+
+
+        if ($this->mode === self::MODE_OFF) {
+            $this->log('error', 'Please activate payment method');
+            $this->setErrorMessage(_JSHOP_ERROR_PAYMENT);
+
+            return false;
+        } elseif ($this->mode === self::MODE_PAYMENTS) {
             // если платёжка, то проверяем ФИО указанные пользователем
             if (empty($params) || empty($params['ya_payments_fio'])) {
                 return false;

@@ -735,15 +735,6 @@ class pm_yandex_money extends PaymentRoot
 
         $this->mode         = $this->getMode($pmConfigs);
 
-        if (!isset($pmConfigs['paymode'])) {
-            $this->log('error', 'Please activate payment method');
-            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
-            JError::raiseWarning('', _JSHOP_ERROR_PAYMENT);
-            $app         = JFactory::getApplication();
-
-            $app->redirect($redirectUrl);
-        }
-
         if ($this->mode === self::MODE_KASSA) {
             $this->processKassaPayment($pmConfigs, $order);
             // если произошла ошибка, редиректим на шаг выбора метода оплаты
@@ -751,7 +742,7 @@ class pm_yandex_money extends PaymentRoot
             $app         = JFactory::getApplication();
             $app->redirect($redirectUrl);
         }
-        $this->ym_pay_mode = ($pmConfigs['paymode'] == '1');
+        $this->ym_pay_mode = (isset($pmConfigs['paymode']) && $pmConfigs['paymode'] == '1');
 
         $uri         = JURI::getInstance();
         $liveUrlHost = $uri->toString(array("scheme", 'host', 'port'));

@@ -818,6 +818,7 @@ class pm_yandex_money extends PaymentRoot
 
     public function processKassaPayment($pmConfigs, $order)
     {
+        $app         = JFactory::getApplication();
         $uri         = JURI::getInstance();
         $redirectUrl = $uri->toString(array('scheme', 'host', 'port'))
             .SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money&no_lang=1&order_id=".$order->order_id);
@@ -831,7 +832,13 @@ class pm_yandex_money extends PaymentRoot
             $cart->load('cart');
         }
 
-        $payment = $this->getKassaPaymentMethod($pmConfigs)->createPayment($order, $cart, $redirectUrl);
+        try {
+            $payment = $this->getKassaPaymentMethod($pmConfigs)->createPayment($order, $cart, $redirectUrl);
+        } catch (\Exception $e) {
+            $redirect = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
+            $app->enqueueMessage(_JSHOP_YM_ERROR_MESSAGE_CREATE_PAYMENT, 'error');
+            $app->redirect($redirectUrl);
+        }
 
         $redirect = $redirectUrl;
         if ($payment !== null) {
@@ -842,10 +849,9 @@ class pm_yandex_money extends PaymentRoot
             $this->getOrderModel()->savePayment($order->order_id, $payment);
         } else {
             $redirect = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
-            $this->setErrorMessage(_JSHOP_YM_ERROR_MESSAGE_CREATE_PAYMENT);
+            $app->enqueueMessage(_JSHOP_YM_ERROR_MESSAGE_CREATE_PAYMENT, 'error');
         }
 
-        $app = JFactory::getApplication();
         $app->redirect($redirect);
     }
 

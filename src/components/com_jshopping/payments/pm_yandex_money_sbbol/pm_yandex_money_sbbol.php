@@ -184,9 +184,6 @@ class pm_yandex_money_sbbol extends PaymentRoot
     function showEndForm($pmconfigs, $order)
     {
         $app = JFactory::getApplication();
-        $this->ym_test_mode = isset($pmconfigs['testmode']) ? $pmconfigs['testmode'] : NULL;
-        $this->ym_pay_mode  = isset($pmconfigs) && ($pmconfigs['paymode'] == '1');
-
         $uri = JURI::getInstance();
 
         $this->loadLanguageFile();

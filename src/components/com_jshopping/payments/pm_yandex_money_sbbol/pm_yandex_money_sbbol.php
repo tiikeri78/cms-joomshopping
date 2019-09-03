@@ -105,8 +105,8 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $array_params = array(
             'testmode',
             'password',
-            'shoppassword',
-            'shopid',
+            'shop_password',
+            'shop_id',
             'scid',
             'account',
             'transaction_end_status',
@@ -183,17 +183,9 @@ class pm_yandex_money_sbbol extends PaymentRoot
      */
     function showEndForm($pmconfigs, $order)
     {
-        if (!isset($pmConfigs['paymode'])) {
-            $this->log('error', 'Please activate payment method');
-            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
-            JError::raiseWarning('', _JSHOP_ERROR_PAYMENT);
-            $app         = JFactory::getApplication();
-
-            $app->redirect($redirectUrl);
-        }
-
-        $this->ym_test_mode = $pmconfigs['testmode'];
-        $this->ym_pay_mode  = ($pmconfigs['paymode'] == '1');
+        $app = JFactory::getApplication();
+        $this->ym_test_mode = isset($pmconfigs['testmode']) ? $pmconfigs['testmode'] : NULL;
+        $this->ym_pay_mode  = isset($pmconfigs) && ($pmconfigs['paymode'] == '1');
 
         $uri = JURI::getInstance();
 
@@ -217,30 +209,35 @@ class pm_yandex_money_sbbol extends PaymentRoot
         $redirectUrl = $uri->toString(array('scheme', 'host', 'port'))
             .SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yandex_money&no_lang=1&order_id=".$order->order_id);
         $redirectUrl = htmlspecialchars_decode($redirectUrl);
+
         try {
             $payment = $this->getKassaPaymentMethod($pmconfigs)->createSbbolPayment($order, $cart, $redirectUrl);
         } catch (\SbbolException $e) {
-
             $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
-            $app         = JFactory::getApplication();
             $app->enqueueMessage('У вас в корзине товары, для которых действуют разные ставки НДС — их нельзя оплатить одновременно. Можно разбить покупку на несколько этапов: сначала оплатить товары с одной ставкой НДС, потом — с другой.',
                 'error');
+            $app->redirect($redirectUrl);
+        } catch (\Exception $e) {
+            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
+            $app->enqueueMessage(_JSHOP_YM_ERROR_MESSAGE_CREATE_PAYMENT, 'error');
             $app->redirect($redirectUrl);
         }
 
         $redirect = $redirectUrl;
+
         if ($payment !== null) {
             $confirmation = $payment->getConfirmation();
+
             if ($confirmation instanceof \YandexCheckout\Model\Confirmation\ConfirmationRedirect) {
                 $redirect = $confirmation->getConfirmationUrl();
             }
+
             $this->getOrderModel()->savePayment($order->order_id, $payment);
         } else {
             $redirect = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
             $this->setErrorMessage(_JSHOP_YM_ERROR_MESSAGE_CREATE_PAYMENT);
         }
 
-        $app = JFactory::getApplication();
         $app->redirect($redirect);
     }
 
@@ -406,10 +403,8 @@ class pm_yandex_money_sbbol extends PaymentRoot
 
     public function log($level, $message, $context = array())
     {
-        if (!$this->debugLog) {
-            return;
-        }
         $replace = array();
+
         foreach ($context as $key => $value) {
             if (is_scalar($value)) {
                 $replace['{'.$key.'}'] = $value;
@@ -417,11 +412,14 @@ class pm_yandex_money_sbbol extends PaymentRoot
                 $replace['{'.$key.'}'] = json_encode($value);
             }
         }
+
         if (!empty($replace)) {
             $message = strtr($message, $replace);
         }
+
         $fileName = $this->getLogFileName();
         $fd       = @fopen($fileName, 'a');
+
         if ($fd) {
             flock($fd, LOCK_EX);
             fwrite($fd, date(DATE_ATOM).' ['.$level.'] '.$message."\r\n");

@@ -31,7 +31,16 @@ if (isset($pmConfigs['kassamode']) && $pmConfigs['paymode']=='1' && $pmConfigs['
     <tbody>
     <?php
     if ($pmConfigs['paymentsmode'] != '1') {
-        $list_methods= array('ym2'=>'PC','cards2'=>'AC');
+        $list_methods = array();
+
+        if (isset($pmConfigs['method_ym2']) && $pmConfigs['method_ym2'] == '1') {
+            $list_methods['ym2'] = 'PC';
+        }
+
+        if (isset($pmConfigs['method_cards2']) && $pmConfigs['method_cards2'] == '1') {
+            $list_methods['cards2'] = 'AC';
+        }
+
         $num+=0;
         foreach ($list_methods as $m_long => $m_short) {
             if (isset($pmConfigs['method_' . $m_long]) && $pmConfigs['method_' . $m_long] == '1' || ($pmConfigs['moneymode'] == '1' && ($m_short == "PC" || $m_short == "AC"))) {

@@ -64,6 +64,7 @@ class pm_yandex_money extends PaymentRoot
     {
         $this->loadLanguageFile();
         $this->mode = $this->getMode($pmConfigs);
+
         if ($this->mode === self::MODE_KASSA) {
             include(dirname(__FILE__)."/payment_form_kassa.php");
         } else {
@@ -95,7 +96,14 @@ class pm_yandex_money extends PaymentRoot
     public function checkPaymentInfo($params, $pmConfigs)
     {
         $this->mode = $this->getMode($pmConfigs);
-        if ($this->mode == self::MODE_PAYMENTS) {
+
+
+        if ($this->mode === self::MODE_OFF) {
+            $this->log('error', 'Please activate payment method');
+            $this->setErrorMessage(_JSHOP_ERROR_PAYMENT);
+
+            return false;
+        } elseif ($this->mode === self::MODE_PAYMENTS) {
             // если платёжка, то проверяем ФИО указанные пользователем
             if (empty($params) || empty($params['ya_payments_fio'])) {
                 return false;
@@ -735,15 +743,6 @@ class pm_yandex_money extends PaymentRoot
 
         $this->mode         = $this->getMode($pmConfigs);
 
-        if (!isset($pmConfigs['paymode'])) {
-            $this->log('error', 'Please activate payment method');
-            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
-            JError::raiseWarning('', _JSHOP_ERROR_PAYMENT);
-            $app         = JFactory::getApplication();
-
-            $app->redirect($redirectUrl);
-        }
-
         if ($this->mode === self::MODE_KASSA) {
             $this->processKassaPayment($pmConfigs, $order);
             // если произошла ошибка, редиректим на шаг выбора метода оплаты
@@ -751,7 +750,7 @@ class pm_yandex_money extends PaymentRoot
             $app         = JFactory::getApplication();
             $app->redirect($redirectUrl);
         }
-        $this->ym_pay_mode = ($pmConfigs['paymode'] == '1');
+        $this->ym_pay_mode = (isset($pmConfigs['paymode']) && $pmConfigs['paymode'] == '1');
 
         $uri         = JURI::getInstance();
         $liveUrlHost = $uri->toString(array("scheme", 'host', 'port'));

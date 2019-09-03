@@ -30,7 +30,7 @@ if (isset($pmConfigs['kassamode']) && $pmConfigs['paymode']=='1' && $pmConfigs['
 <table class="radio" style="margin-left: 50px;">
     <tbody>
     <?php
-    if ($pmConfigs['paymentsmode'] != '1') {
+    if ($pmConfigs['moneymode'] == '1') {
         $list_methods = array();
 
         if (isset($pmConfigs['method_ym2']) && $pmConfigs['method_ym2'] == '1') {
@@ -60,7 +60,7 @@ if (isset($pmConfigs['kassamode']) && $pmConfigs['paymode']=='1' && $pmConfigs['
                 </tr>
             <?php }
         }
-    } else { ?>
+    } elseif ($pmConfigs['paymentsmode'] == '1') { ?>
         <tr>
             <td width="150" rowspan="2" valign="top" style="padding-top: 5px;">
                 <label for="ya_payments_fio"><?php echo _JSHOP_YM_PAYMENTS_FIO_LABEL; ?></label>

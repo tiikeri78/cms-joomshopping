@@ -3,6 +3,7 @@
 
 namespace YandexMoney\Model;
 
+use http\Exception;
 use YandexCheckout\Client;
 use YandexCheckout\Common\Exceptions\NotFoundException;
 use YandexCheckout\Model\ConfirmationType;
@@ -166,8 +167,7 @@ class KassaPaymentMethod
             $payment = $this->getClient()->createPayment($request);
         } catch (\Exception $e) {
             $this->module->log('error', 'Failed to create payment: '.$e->getMessage());
-
-            return null;
+            throw $e;
         }
 
         return $payment;
@@ -247,8 +247,7 @@ class KassaPaymentMethod
             $payment = $this->getClient()->createPayment($request);
         } catch (\Exception $e) {
             $this->module->log('error', 'Failed to create payment: '.$e->getMessage());
-
-            return null;
+            throw $e;
         }
 
         return $payment;

@@ -373,6 +373,9 @@ class KassaPaymentMethod
             $this->client = new Client();
             $this->client->setAuth($this->shopId, $this->password);
             $this->client->setLogger($this->module);
+            $userAgent = $this->client->getApiClient()->getUserAgent();
+            $userAgent->setCms('Joomla', JSFactory::getConfig()->getVersion());
+            $userAgent->setModule('Y.CMS Joomshopping ', _JSHOP_YM_VERSION);
         }
 
         return $this->client;

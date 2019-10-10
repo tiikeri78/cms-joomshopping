@@ -7,6 +7,7 @@ defined('_JEXEC') or die('Restricted access');
 
 require_once dirname(__FILE__).'/../../../components/com_jshopping/payments/payment.php';
 require_once dirname(__FILE__).'/../../../components/com_jshopping/payments/pm_yandex_money/pm_yandex_money.php';
+require_once dirname(__FILE__).'/../../../components/com_jshopping/payments/pm_yandex_money/lib/Model/KassaSecondReceiptModel.php';
 
 class plgJshoppingAdminPm_yandex_money extends JPlugin
 {
@@ -38,9 +39,19 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
             return;
         }
 
-        $onHoldStatus   = $pmconfig['ya_kassa_hold_mode_on_hold_status'];
-        $cancelStatus   = $pmconfig['ya_kassa_hold_mode_cancel_status'];
-        $completeStatus = $pmconfig['kassa_transaction_end_status'];
+        $onHoldStatus        = $pmconfig['ya_kassa_hold_mode_on_hold_status'];
+        $cancelStatus        = $pmconfig['ya_kassa_hold_mode_cancel_status'];
+        $completeStatus      = $pmconfig['kassa_transaction_end_status'];
+
+        $secondReceiptStatus = isset($pmconfig['kassa_second_receipt_status']) ?
+                                $pmconfig['kassa_second_receipt_status'] :
+                                '';
+
+
+        if ($kassa->isSendReceipt() && $kassa->isSendSecondReceipt() && ($status == $secondReceiptStatus)) {
+            $this->sendSecondReceipt($order_id, $pmconfig);
+        }
+
         if (!in_array($status, array($completeStatus, $cancelStatus))) {
             return;
         }
@@ -100,6 +111,29 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
             }
             $order->order_status = $cancelStatus;
             $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_SUCCESS);
+        }
+    }
+
+    public function sendSecondReceipt($orderId, $pmconfig)
+    {
+        $pm_yandex_money = new pm_yandex_money();
+        $kassa           = $pm_yandex_money->getKassaPaymentMethod($pmconfig);
+        $apiClient = $kassa->getClient();
+        $order     = JSFactory::getTable('order', 'jshop');
+        $order->load($orderId);
+
+        $orderInfo = array(
+            'orderId'    => $order->order_id,
+            'user_email' => $order->email,
+            'user_phone' => $order->phone,
+        );
+
+        $paymentInfo = $apiClient->getPaymentInfo($pm_yandex_money->getOrderModel()->getPaymentIdByOrderId($order->order_id));
+
+        $secondReceipt = new \YandexMoney\Model\KassaSecondReceiptModel($paymentInfo, $orderInfo, $apiClient, $pmconfig['debug_log']);
+
+        if ($secondReceipt->sendSecondReceipt()) {
+            $pm_yandex_money->saveOrderHistory($order, sprintf(_JSHOP_YM_KASSA_SEND_SECOND_RECEIPT_HISTORY, $secondReceipt->getSettlementsSum()));
         }
     }
 }

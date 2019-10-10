@@ -34,6 +34,7 @@ class KassaPaymentMethod
     private $defaultTaxRateId;
     private $taxRates;
     private $sendReceipt;
+    private $isSendSecondReceipt;
     private $descriptionTemplate;
     private $isEnableHoldMode;
     private $pmconfigs;
@@ -90,6 +91,7 @@ class KassaPaymentMethod
 
         $this->sendReceipt      = isset($pmConfig['ya_kassa_send_check']) && $pmConfig['ya_kassa_send_check'] == '1';
         $this->isEnableHoldMode = isset($pmConfig['ya_kassa_enable_hold_mode']) && $pmConfig['ya_kassa_enable_hold_mode'] == '1';
+        $this->isSendSecondReceipt = isset($pmConfig['send_second_receipt']) && $pmConfig['send_second_receipt'] == '1';
     }
 
     public function getShopId()
@@ -109,6 +111,7 @@ class KassaPaymentMethod
      *
      * @return null|\YandexCheckout\Request\Payments\CreatePaymentResponse
      *
+     * @throws \Exception
      * @since version
      */
     public function createPayment($order, $cart, $returnUrl)
@@ -174,6 +177,13 @@ class KassaPaymentMethod
     }
 
 
+    /**
+     * @param $order
+     * @param $cart
+     * @param $returnUrl
+     * @return \YandexCheckout\Request\Payments\CreatePaymentResponse|null
+     * @throws \SbbolException
+     */
     public function createSbbolPayment($order, $cart, $returnUrl)
     {
         try {
@@ -431,5 +441,10 @@ class KassaPaymentMethod
     public function isSendReceipt()
     {
         return $this->sendReceipt;
+    }
+
+    public function isSendSecondReceipt()
+    {
+        return $this->isSendSecondReceipt;
     }
 }

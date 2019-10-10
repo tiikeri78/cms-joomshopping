@@ -1061,6 +1061,7 @@ class pm_yandex_money extends PaymentRoot
         if (!$this->debugLog) {
             return;
         }
+
         $replace = array();
         foreach ($context as $key => $value) {
             if (is_scalar($value)) {
@@ -1069,11 +1070,14 @@ class pm_yandex_money extends PaymentRoot
                 $replace['{'.$key.'}'] = json_encode($value);
             }
         }
+
         if (!empty($replace)) {
             $message = strtr($message, $replace);
         }
+
         $fileName = $this->getLogFileName();
         $fd       = @fopen($fileName, 'a');
+
         if ($fd) {
             flock($fd, LOCK_EX);
             fwrite($fd, date(DATE_ATOM).' ['.$level.'] '.$message."\r\n");

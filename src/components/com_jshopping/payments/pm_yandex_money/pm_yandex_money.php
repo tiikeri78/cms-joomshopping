@@ -631,7 +631,7 @@ class pm_yandex_money extends PaymentRoot
                             $order->changeProductQTYinStock("-");
                         }
 
-                        $this->sendSecondReceipt($order->order_id, $pmConfigs);
+                        $this->sendSecondReceipt($order->order_id, $pmConfigs, $endStatus);
                         $checkout->changeStatusOrder($order->order_id, $endStatus, 0);
                         $message = '';
                         $paymentMethod = $payment->getPaymentMethod();
@@ -1370,12 +1370,16 @@ class pm_yandex_money extends PaymentRoot
         return $history->store();
     }
 
-    public function sendSecondReceipt($orderId, $pmconfig)
+    public function sendSecondReceipt($orderId, $pmconfig, $status)
     {
         $kassa = $this->getKassaPaymentMethod($pmconfig);
         $apiClient = $kassa->getClient();
         $order     = JSFactory::getTable('order', 'jshop');
         $order->load($orderId);
+
+        if ($kassa->isSendReceipt() && $kassa->isSendSecondReceipt() && ($status == $kassa->getSecondReceiptStatus)) {
+            return;
+        }
 
         $orderInfo = array(
             'orderId'    => $order->order_id,

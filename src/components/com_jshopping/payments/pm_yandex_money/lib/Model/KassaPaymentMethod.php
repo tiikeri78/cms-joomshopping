@@ -443,4 +443,9 @@ class KassaPaymentMethod
     {
         return isset($this->pmconfigs['send_second_receipt']) && $this->pmconfigs['send_second_receipt'] == '1';
     }
+
+    public function getSecondReceiptStatus()
+    {
+        return $this->pmconfigs['kassa_second_receipt_status'];
+    }
 }

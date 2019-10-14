@@ -44,9 +44,9 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
             '';
 
 
-        if ($kassa->isSendReceipt() && $kassa->isSendSecondReceipt() && ($status == $secondReceiptStatus)) {
-            $pm_yandex_money->sendSecondReceipt($order_id, $pmconfig);
-        }
+
+        $pm_yandex_money->sendSecondReceipt($order_id, $pmconfig, $status);
+
 
         if (!$kassa->isEnableHoldMode()) {
             return;
@@ -99,9 +99,9 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
             $order->order_status = $completeStatus;
             $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CAPTURE_PAYMENT_SUCCESS);
 
-            if ($kassa->isSendReceipt() && $kassa->isSendSecondReceipt() && ($status == $secondReceiptStatus)) {
-                $pm_yandex_money->sendSecondReceipt($order_id, $pmconfig);
-            }
+
+            $pm_yandex_money->sendSecondReceipt($order_id, $pmconfig, $completeStatus);
+
         }
 
         if ($status === $cancelStatus) {

@@ -5,6 +5,7 @@ namespace YandexMoney\Model;
 
 use YandexCheckout\Client;
 use YandexCheckout\Model\PaymentInterface;
+use YandexCheckout\Model\PaymentStatus;
 use YandexCheckout\Model\Receipt\PaymentMode;
 use YandexCheckout\Model\ReceiptCustomer;
 use YandexCheckout\Model\ReceiptItem;
@@ -109,7 +110,7 @@ class KassaSecondReceiptModel
             $amount += $settlement->getAmount()->getIntegerValue();
         }
 
-        $this->settlementsSum = number_format($amount / 100.0, 2, '.', ' ');
+        $this->settlementsSum = $amount / 100.0;
     }
 
     /**
@@ -181,7 +182,7 @@ class KassaSecondReceiptModel
             return false;
         }
 
-        if ($paymentInfo->getStatus() !== \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
+        if ($paymentInfo->getStatus() !== PaymentStatus::SUCCEEDED) {
             $this->log("error", "Fail send second receipt payment have incorrect status: " . $paymentInfo->getStatus());
             return false;
         }

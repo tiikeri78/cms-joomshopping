@@ -626,9 +626,12 @@ class pm_yandex_money extends PaymentRoot
                         } else {
                             $product_stock_removed = 1;
                         }
+
                         if ($product_stock_removed) {
                             $order->changeProductQTYinStock("-");
                         }
+
+                        $this->sendSecondReceipt($order->order_id, $pmConfigs);
                         $checkout->changeStatusOrder($order->order_id, $endStatus, 0);
                         $message = '';
                         $paymentMethod = $payment->getPaymentMethod();
@@ -1365,6 +1368,28 @@ class pm_yandex_money extends PaymentRoot
         $history->comments          = $comments;
 
         return $history->store();
+    }
+
+    public function sendSecondReceipt($orderId, $pmconfig)
+    {
+        $kassa = $this->getKassaPaymentMethod($pmconfig);
+        $apiClient = $kassa->getClient();
+        $order     = JSFactory::getTable('order', 'jshop');
+        $order->load($orderId);
+
+        $orderInfo = array(
+            'orderId'    => $order->order_id,
+            'user_email' => $order->email,
+            'user_phone' => $order->phone,
+        );
+
+        $paymentInfo = $apiClient->getPaymentInfo($this->getOrderModel()->getPaymentIdByOrderId($order->order_id));
+
+        $secondReceipt = new \YandexMoney\Model\KassaSecondReceiptModel($paymentInfo, $orderInfo, $apiClient);
+
+        if ($secondReceipt->sendSecondReceipt()) {
+            $this->saveOrderHistory($order, sprintf(_JSHOP_YM_KASSA_SEND_SECOND_RECEIPT_HISTORY, number_format($secondReceipt->getSettlementsSum(), 2, '.', ' ')));
+        }
     }
 
 }

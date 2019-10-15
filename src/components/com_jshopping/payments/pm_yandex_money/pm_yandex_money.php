@@ -240,6 +240,11 @@ class pm_yandex_money extends PaymentRoot
             'ya_kassa_default_delivery_payment_subject',
         );
 
+        $offPaymentMethods = array(
+            \YandexCheckout\Model\PaymentMethodType::B2B_SBERBANK,
+            \YandexCheckout\Model\PaymentMethodType::WECHAT,
+        );
+
         $paymentModeEnum = array(
             PaymentMode::FULL_PREPAYMENT    => 'Полная предоплата ('.PaymentMode::FULL_PREPAYMENT.')',
             PaymentMode::PARTIAL_PREPAYMENT => 'Частичная предоплата ('.PaymentMode::PARTIAL_PREPAYMENT.')',

@@ -9,11 +9,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$offPaymentMethods = array(
-    \YandexCheckout\Model\PaymentMethodType::B2B_SBERBANK,
-    \YandexCheckout\Model\PaymentMethodType::WECHAT,
-);
-
 echo JHtml::_('bootstrap.addTab', 'yamTab', 'kassa-tab', _JSHOP_YM_TAB_KASSA);
 
 ?>

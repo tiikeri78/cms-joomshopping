@@ -15,6 +15,7 @@ use YandexCheckout\Model\PaymentStatus;
 use YandexCheckout\Model\Receipt\PaymentMode;
 use YandexCheckout\Model\Receipt\PaymentSubject;
 use YandexMoney\Model\KassaPaymentMethod;
+use YandexMoney\Model\KassaSecondReceiptModel;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -637,6 +638,7 @@ class pm_yandex_money extends PaymentRoot
                         }
 
                         $this->sendSecondReceipt($order->order_id, $pmConfigs, $endStatus);
+
                         $checkout->changeStatusOrder($order->order_id, $endStatus, 0);
                         $message = '';
                         $paymentMethod = $payment->getPaymentMethod();
@@ -854,6 +856,7 @@ class pm_yandex_money extends PaymentRoot
             if ($confirmation instanceof \YandexCheckout\Model\Confirmation\ConfirmationRedirect) {
                 $redirect = $confirmation->getConfirmationUrl();
             }
+
             $this->getOrderModel()->savePayment($order->order_id, $payment);
         } else {
             $redirect = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
@@ -1382,9 +1385,6 @@ class pm_yandex_money extends PaymentRoot
         $order     = JSFactory::getTable('order', 'jshop');
         $order->load($orderId);
 
-        if ($kassa->isSendReceipt() && $kassa->isSendSecondReceipt() && ($status == $kassa->getSecondReceiptStatus)) {
-            return;
-        }
 
         $orderInfo = array(
             'orderId'    => $order->order_id,
@@ -1392,13 +1392,48 @@ class pm_yandex_money extends PaymentRoot
             'user_phone' => $order->phone,
         );
 
-        $paymentInfo = $apiClient->getPaymentInfo($this->getOrderModel()->getPaymentIdByOrderId($order->order_id));
-
-        $secondReceipt = new \YandexMoney\Model\KassaSecondReceiptModel($paymentInfo, $orderInfo, $apiClient);
-
-        if ($secondReceipt->sendSecondReceipt()) {
-            $this->saveOrderHistory($order, sprintf(_JSHOP_YM_KASSA_SEND_SECOND_RECEIPT_HISTORY, number_format($secondReceipt->getSettlementsSum(), 2, '.', ' ')));
+        if (!$this->isNeedSecondReceipt($status, $kassa->isSendReceipt(), $kassa->isSendSecondReceipt(), $kassa->getSecondReceiptStatus())) {
+            return;
         }
+
+        try {
+            $paymentInfo = $apiClient->getPaymentInfo($this->getOrderModel()->getPaymentIdByOrderId($order->order_id));
+        } catch (Exception $e) {
+            $this->log('info', 'fail get payment info');
+            return;
+        }
+
+        $secondReceipt = new KassaSecondReceiptModel($paymentInfo, $orderInfo, $apiClient);
+        if ($secondReceipt->sendSecondReceipt()) {
+            $this->saveOrderHistory(
+                    $order,
+                    sprintf(
+                _JSHOP_YM_KASSA_SEND_SECOND_RECEIPT_HISTORY,
+                        number_format($secondReceipt->getSettlementsSum(), 2, '.', ' ')
+                    )
+            );
+        }
+    }
+
+    /**
+     * @param $status
+     * @param $isSendReceipt
+     * @param $isSendSecondReceipt
+     * @param $secondReceiptStatus
+     *
+     * @return bool
+     */
+    public function isNeedSecondReceipt($status, $isSendReceipt, $isSendSecondReceipt, $secondReceiptStatus)
+    {
+        if (!$isSendReceipt) {
+            return false;
+        } elseif (!$isSendSecondReceipt) {
+            return false;
+        } elseif ((int)$status !== (int)$secondReceiptStatus) {
+            return false;
+        }
+
+        return true;
     }
 
 }

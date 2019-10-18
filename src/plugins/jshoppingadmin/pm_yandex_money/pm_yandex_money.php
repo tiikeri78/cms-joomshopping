@@ -14,14 +14,14 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
 
     public function onBeforeChangeOrderStatusAdmin($order_id, &$status)
     {
-        $paymentmethod = JSFactory::getTable('paymentmethod', 'jshop');
+        $paymentMethod = JSFactory::getTable('paymentmethod', 'jshop');
 
-        $all_payment_methods = $paymentmethod->getAllPaymentMethods();
+        $all_payment_methods = $paymentMethod->getAllPaymentMethods();
         $pm_kassa            = null;
 
         foreach ($all_payment_methods as $pm) {
-            $scriptname = ($pm->scriptname != '') ? $pm->scriptname : $pm->payment_class;
-            if ($scriptname !== 'pm_yandex_money') {
+            $scriptName = ($pm->scriptname != '') ? $pm->scriptname : $pm->payment_class;
+            if ($scriptName !== 'pm_yandex_money') {
                 continue;
             }
             $pm_kassa = $pm;
@@ -32,21 +32,14 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
             return;
         }
 
-        $paymentmethod->load($pm_kassa->payment_id);
+        $paymentMethod->load($pm_kassa->payment_id);
         $parseString = new parseString($pm_kassa->payment_params);
         $pmconfig    = $parseString->parseStringToParams();
 
         $pm_yandex_money = new pm_yandex_money();
         $kassa           = $pm_yandex_money->getKassaPaymentMethod($pmconfig);
 
-        $secondReceiptStatus = isset($pmconfig['kassa_second_receipt_status']) ?
-            $pmconfig['kassa_second_receipt_status'] :
-            '';
-
-
-
         $pm_yandex_money->sendSecondReceipt($order_id, $pmconfig, $status);
-
 
         if (!$kassa->isEnableHoldMode()) {
             return;
@@ -107,11 +100,13 @@ class plgJshoppingAdminPm_yandex_money extends JPlugin
         if ($status === $cancelStatus) {
             $apiClient = $kassa->getClient();
             $payment   = null;
+
             try {
                 $payment = $apiClient->cancelPayment($order->transaction);
             } catch (\Exception $e) {
                 $pm_yandex_money->log('error', 'Capture error: '.$e->getMessage());
             }
+
             if (!$payment || $payment->getStatus() !== PaymentStatus::CANCELED) {
                 $status = $onHoldStatus;
                 $pm_yandex_money->saveOrderHistory($order, _JSHOP_YM_HOLD_MODE_CANCEL_PAYMENT_FAIL);

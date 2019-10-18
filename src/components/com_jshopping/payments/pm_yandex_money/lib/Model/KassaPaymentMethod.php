@@ -446,6 +446,6 @@ class KassaPaymentMethod
 
     public function getSecondReceiptStatus()
     {
-        return $this->pmconfigs['kassa_second_receipt_status'];
+        return (int)$this->pmconfigs['kassa_second_receipt_status'];
     }
 }

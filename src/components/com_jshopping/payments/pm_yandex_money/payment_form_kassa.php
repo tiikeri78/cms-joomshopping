@@ -53,7 +53,7 @@ if ($pmConfigs['paymode'] != '1') : ?>
                     <td><img src="<?php echo JURI::root(); ?>components/com_jshopping/images/yandex_money/<?php echo strtolower($short); ?>.png">
                     </td>
                     <td>
-                        <label for="yandex_money_<?php echo $long; ?>"><?php echo constant('_JSHOP_YM_METHOD_' . strtoupper($long) . '_DESCRIPTION'); ?></label>
+                        <label for="yandex_money_<?php echo $long; ?>"><?php echo constant('_JSHOP_YM_METHOD_' . strtoupper($long) . '_DESCRIPTION_PUBLIC'); ?></label>
                     </td>
                 </tr>
                 <?php if ($long === PaymentMethodType::ALFABANK) : ?>

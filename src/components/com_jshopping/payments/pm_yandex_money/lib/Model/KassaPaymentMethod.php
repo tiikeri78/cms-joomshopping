@@ -27,6 +27,8 @@ if (!defined(_JSHOP_YM_VERSION)) {
 
 class KassaPaymentMethod
 {
+    const PAYMENT_METHOD_WIDGET = 'widget';
+
     private $module;
     private $client;
     private $defaultTaxRateId;
@@ -135,9 +137,15 @@ class KassaPaymentMethod
                         'type'  => $paymentType,
                         'phone' => preg_replace('/[^\d]+/', '', $params['qiwiPhone']),
                     );
+                } elseif ($paymentType === self::PAYMENT_METHOD_WIDGET) {
+                    $confirmation = ConfirmationType::EMBEDDED;
                 }
-                $builder->setPaymentMethodData($paymentType);
+
+                if ($paymentType !== self::PAYMENT_METHOD_WIDGET) {
+                    $builder->setPaymentMethodData($paymentType);
+                }
             }
+
             $builder->setConfirmation($confirmation);
 
             $receipt = null;

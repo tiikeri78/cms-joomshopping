@@ -1,15 +1,3 @@
-<style>
-    #ym-btn-back {
-        margin: 10px 0;
-        background: #fc0;
-        border: none;
-        border-radius: 3px;
-        color: #333;
-        height: 35px;
-        line-height: 35px;
-        font-family: Arial, serif;
-    }
-</style>
 <script src="https://kassa.yandex.ru/checkout-ui/v2.js"></script>
 <script>
     const checkout = new window.YandexCheckout({
@@ -26,7 +14,7 @@
 </script>
 
 <div id="ym-widget-checkout-ui"></div>
-<button onclick="history.go(-1);" id="ym-btn-back">Вернуться назад</button>
+<button onclick="history.go(-1);" class="a_checkout_back_button btn">Вернуться назад</button>
 
 <script>
     document.addEventListener("DOMContentLoaded", function (event) {

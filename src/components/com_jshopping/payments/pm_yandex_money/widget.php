@@ -13,8 +13,8 @@
     });
 </script>
 
-<div id="ym-widget-checkout-ui"></div>
-<button onclick="history.go(-1);" class="a_checkout_back_button btn">Вернуться назад</button>
+<div id="ym-widget-checkout-ui" style="margin-top: 20px"></div>
+<button onclick="history.go(-1);" class="a_checkout_back_button btn"><?=constant("_JSHOP_YM_BTN_BACK")?></button>
 
 <script>
     document.addEventListener("DOMContentLoaded", function (event) {

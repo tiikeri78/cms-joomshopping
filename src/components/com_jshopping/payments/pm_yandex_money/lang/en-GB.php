@@ -224,3 +224,5 @@ define('_JSHOP_YM_LOGS_LABEL', 'Logs');
 
 define('_JSHOP_YM_TAB_UPDATE', 'Module update');
 
+define('_JSHOP_YM_BTN_BACK', 'Back');
+

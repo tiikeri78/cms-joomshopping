@@ -239,3 +239,4 @@ define('_JSHOP_YM_LOGS_LABEL', 'Журнал сообщений модуля');
 
 define('_JSHOP_YM_TAB_UPDATE', 'Обновления');
 
+define('_JSHOP_YM_BTN_BACK', 'Назад');

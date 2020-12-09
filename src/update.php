@@ -34,7 +34,7 @@ $queryParams = array(
 );
 
 $valuesYm = array(
-    $db->quote('YooMoney20'),
+    $db->quote('YooMoney'),
     $db->quote('pm_yoomoney'),
     1,
     0,
@@ -43,8 +43,8 @@ $valuesYm = array(
     0,
     1,
     0,
-    $db->quote('YooMoney 2.0'),
-    $db->quote('YooMoney 2.0'),
+    $db->quote('YooMoney'),
+    $db->quote('YooMoney'),
 );
 
 $valuesYmSbbol = array(
@@ -57,8 +57,8 @@ $valuesYmSbbol = array(
     0,
     1,
     0,
-    $db->quote('YooKassa 2.0: Sbbol'),
-    $db->quote('YooKassa 2.0: Sbbol'),
+    $db->quote('YooKassa: Sbbol'),
+    $db->quote('YooKassa: Sbbol'),
 );
 
 
@@ -86,13 +86,13 @@ $columns = $db->getTableColumns('#__jshopping_payment_method');
 if (isset($columns['name_ru-RU'])) {
     $query = $db->getQuery(true);
     $query->update('#__jshopping_payment_method')
-        ->set($db->quoteName('name_ru-RU') . ' = ' . $db->quote('ЮMoney 2.0'))
-        ->where(array($db->quoteName('payment_code') . ' = ' . $db->quote('YooMoney20')));
+        ->set($db->quoteName('name_ru-RU') . ' = ' . $db->quote('ЮMoney'))
+        ->where(array($db->quoteName('payment_code') . ' = ' . $db->quote('YooMoney')));
     $db->setQuery($query)->execute();
 
     $query = $db->getQuery(true);
     $query->update('#__jshopping_payment_method')
-        ->set($db->quoteName('name_ru-RU') . ' = ' . $db->quote('ЮКасса 2.0: Сббол'))
+        ->set($db->quoteName('name_ru-RU') . ' = ' . $db->quote('ЮKassa: Сббол'))
         ->where(array($db->quoteName('payment_code') . ' = ' . $db->quote('YooMoneySbbol')));
     $db->setQuery($query)->execute();
 }

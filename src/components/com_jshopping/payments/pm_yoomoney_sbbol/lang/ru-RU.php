@@ -15,7 +15,6 @@ define('_JSHOP_YOO_VERSION_DESCRIPTION','Версия модуля ');
 
 define('_JSHOP_YOO_TAB_MONEY', 'ЮMoney');
 define('_JSHOP_YOO_TAB_KASSA', 'ЮKassa');
-define('_JSHOP_YOO_TAB_PAYMENTS', 'Платежка');
 
 define('_JSHOP_YOO_KASSA_ON', 'Включить приём платежей через ЮKassa');
 define('_JSHOP_YOO_KASSA_TEST', 'Тестовый режим');
@@ -51,12 +50,12 @@ define('_JSHOP_YOO_HOLD_MODE_CAPTURE_PAYMENT_SUCCESS', 'Вы подтверди�
 define('_JSHOP_YOO_HOLD_MODE_CAPTURE_PAYMENT_FAIL', 'Платёж не подтвердился. Попробуйте ещё раз.');
 define('_JSHOP_YOO_HOLD_MODE_CANCEL_PAYMENT_SUCCESS', 'Вы отменили платёж в ЮKassa. Деньги вернутся клиенту.');
 define('_JSHOP_YOO_HOLD_MODE_CANCEL_PAYMENT_FAIL', 'Платёж не отменился. Попробуйте ещё раз.');
-define('_JSHOP_YOO_KASSA_PAYMODE_KASSA', 'На стороне Кассы');
+define('_JSHOP_YOO_KASSA_PAYMODE_KASSA', 'На стороне Юkassa');
 define('_JSHOP_YOO_KASSA_PAYMODE_SHOP', 'На стороне магазина');
 define('_JSHOP_YOO_KASSA_PAYMODE_LINK', '<a href=\'https://yookassa.ru/docs/payment-solution/payment-form/basics\' target=\'_blank\'>Подробнее о сценариях оплаты</a>');
 define('_JSHOP_YOO_KASSA_SELECT_TEXT', 'Отметьте способы оплаты, которые указаны в вашем договоре с ЮMoney');
 define('_JSHOP_YOO_KASSA_CREDENTIALS_ERROR', 'Проверьте shopId и Секретный ключ — где-то есть ошибка. А лучше скопируйте их прямо из <a href="https://yookassa.ru/my/" target="_blank">личного кабинета ЮKassa</a>');
-define('_JSHOP_YOO_KASSA_TEST_WARNING', 'Вы включили тестовый режим приема платежей. Проверьте, как проходит оплата, и напишите менеджеру Кассы. Он выдаст рабочие shopId и Секретный ключ. <a href="https://yookassa.ru/docs/support/payments/onboarding/integration#api__04" target="_blank">Инструкция</a>');
+define('_JSHOP_YOO_KASSA_TEST_WARNING', 'Вы включили тестовый режим приема платежей. Проверьте, как проходит оплата, и напишите менеджеру Юkassa. Он выдаст рабочие shopId и Секретный ключ. <a href="https://yookassa.ru/docs/support/payments/onboarding/integration#api__04" target="_blank">Инструкция</a>');
 define('_JSHOP_YOO_METHOD_YOO_MONEY_DESCRIPTION', 'ЮMoney');
 define('_JSHOP_YOO_METHOD_CARDS_DESCRIPTION', 'Банковские карты');
 define('_JSHOP_YOO_METHOD_BANK_CARD_DESCRIPTION', 'Банковские карты');
@@ -92,12 +91,6 @@ define('_JSHOP_YOO_METHOD_CARDS2_DESCRIPTION', 'Банковская карта'
 define('_JSHOP_YOO_COMMON_HEAD', 'Дополнительные настройки для администратора');
 define('_JSHOP_YOO_COMMON_STATUS', 'Статус заказа после оплаты');
 
-define('_JSHOP_YOO_PAYMENTS_ON', 'Включить прием платежей через Платежку');
-define('_JSHOP_YOO_PAYMENTS_ID_LABEL', 'ID формы');
-define('_JSHOP_YOO_PAYMENTS_DESCRIPTION_LABEL', 'Назначение платежа');
-define('_JSHOP_YOO_PAYMENTS_DESCRIPTION_PLACEHOLDER', 'Номер заказа %order_id%. Оплата через Платежку');
-define('_JSHOP_YOO_PAYMENTS_DESCRIPTION_INFO', 'Назначение будет в платежном поручении от банка. Напишите в нем всё,
-что поможет отличить заказ, который оплатили через Платежку.');
 define('_JSHOP_YOO_PAYMENTS_STATUS_LABEL', 'Статус заказа');
 define('_JSHOP_YOO_PAYMENTS_STATUS_INFO', 'Статус должен показать, что результат платежа неизвестен: о том, что клиент
 заплатил, можно узнать только из письма от Платежки или в своем банке.');
@@ -114,7 +107,6 @@ define('_JSHOP_YOO_MODE_DESCRIPTION', 'Способ приема платеже�
 define('_JSHOP_YOO_MODE1_DESCRIPTION', 'ЮMoneyи');
 define('_JSHOP_YOO_MODE2_DESCRIPTION', 'ЮKassa (выбор оплаты на стороне сайта)');
 define('_JSHOP_YOO_MODE3_DESCRIPTION', 'ЮKassa (выбор оплаты на стороне ЮKassa)');
-define('_JSHOP_YOO_MODE4_DESCRIPTION', 'Платежка (банковские карты, кошелек)');
 define('_JSHOP_YOO_REG_IND', 'Если у вас нет аккаунта в ЮMoney, то следует зарегистрироваться тут - <a href="https://yoomoney.ru/" target="_blank">https://yoomoney.ru/</a><br/><b>ВАЖНО!</b> Вам нужно будет указать ссылку для приема HTTP уведомлений здесь - <a href="https://yoomoney.ru/transfer/myservices/http-notification">https://yoomoney.ru/transfer/myservices/http-notification</a>');
 
 define('_JSHOP_YOO_REG_ORG', 'Для работы с модулем необходимо <a href="https://yookassa.ru/joinups">подключить магазин к ЮKassa</a>. После подключения вы получите параметры для приема платежей (идентификатор магазина — shopId и номер витрины — scid).');

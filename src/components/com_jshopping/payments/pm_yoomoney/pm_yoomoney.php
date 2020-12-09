@@ -41,7 +41,7 @@ class pm_yoomoney extends PaymentRoot
     private $debugLog = true;
 
     private $element = 'pm_yoomoney';
-    private $repository = 'yoomoney/yoomoney-cms-v2-joomshopping';
+    private $repository = 'yoomoney/cms-joomshopping';
     private $downloadDirectory = 'pm_yoomoney';
     private $backupDirectory = 'pm_yoomoney/backups';
     private $versionDirectory = 'pm_yoomoney/download';

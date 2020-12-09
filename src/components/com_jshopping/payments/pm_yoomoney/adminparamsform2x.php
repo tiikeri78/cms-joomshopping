@@ -45,7 +45,6 @@ function escapeValue($value)
         $state[] = JHTML::_('select.option', '1', _JSHOP_YOO_MODE1_DESCRIPTION,  'value', 'text');
         $state[] = JHTML::_('select.option', '2', _JSHOP_YOO_MODE2_DESCRIPTION);
         $state[] = JHTML::_('select.option', '3', _JSHOP_YOO_MODE3_DESCRIPTION);
-        $state[] = JHTML::_('select.option', '4', _JSHOP_YOO_MODE4_DESCRIPTION);
         echo JHTML::_('select.genericlist', $state, 'pm_params[mode]', 'style="width: 300px;" onchange="yoomoney_validate_mode()"', 'value', 'text', $params['mode'], 'yoomode');
     ?>
     </td>
@@ -104,12 +103,6 @@ function escapeValue($value)
     </td>
 </tr>
 
-<tr class="payments">
-    <td></td>
-    <td>
-        <?php echo _JSHOP_YOO_PAYMENTS_HEAD; ?><br /><br />
-    </td>
-</tr>
 
 <tr class="with-select">
     <td class="key" colspan="2"><br/><br/><b><?php echo _JSHOP_YOO_METHODS_DESCRIPTION; ?></b></td>
@@ -184,30 +177,6 @@ foreach ($list_methods as $m_long => $m_short) : ?>
         <input type = "text" class = "inputbox" name = "pm_params[account]" size="45" value = "<?php echo $params['account']?>" />
     </td>
 </tr>
-<tr class="payments">
-    <td  class="key">
-        <b><?php echo _JSHOP_YOO_PAYMENTS_ID_LABEL;?></b>
-    </td>
-    <td>
-        <input type = "text" class = "inputbox" name = "pm_params[yoopay_id]" size="45" value = "<?php echo $params['yoopay_id']?>" />
-    </td>
-</tr>
-<tr class="payments">
-    <td></td>
-    <td><br /></td>
-</tr>
-<tr class="payments">
-    <td  class="key">
-        <b><?php echo _JSHOP_YOO_PAYMENTS_DESCRIPTION_LABEL;?></b>
-    </td>
-    <td>
-        <input type = "text" class = "inputbox" name = "pm_params[yoopay_desc]" size="45" value = "<?php echo empty($params['yoopay_desc']) ? _JSHOP_YOO_PAYMENTS_DESCRIPTION_PLACEHOLDER : escapeValue($params['yoopay_desc']); ?>" />
-    </td>
-</tr>
-<tr class="payments">
-    <td></td>
-    <td><?php echo _JSHOP_YOO_PAYMENTS_DESCRIPTION_INFO; ?><br /><br /></td>
-</tr>
 
 
 <tr>
@@ -260,9 +229,7 @@ foreach ($list_methods as $m_long => $m_short) : ?>
         jQuery(function($){
             var yoomoney_mode = $("#yoomode").val();
             if (yoomoney_mode == 1) {
-                $(".without-select").hide();
                 $(".org").hide();
-                $(".payments").hide();
                 $(".individ").show();
 
                 $("#kassamode").val('0');
@@ -270,9 +237,7 @@ foreach ($list_methods as $m_long => $m_short) : ?>
                 $("#paymentsmode").val('0');
                 $("#paymode").val('0');
             } else if (yoomoney_mode == 2) {
-                $(".without-select").hide();
                 $(".individ").hide();
-                $(".payments").hide();
                 $(".org").show();
                 $(".with-select").show();
 
@@ -290,19 +255,7 @@ foreach ($list_methods as $m_long => $m_short) : ?>
 
                 $("#kassamode").val('1');
                 $("#moneymode").val('0');
-                $("#paymentsmode").val('0');
                 $("#paymode").val('1');
-            } else if (yoomoney_mode == 4) {
-                $(".with-select").hide();
-                $(".individ").hide();
-                $(".org").hide();
-                $(".payments").show();
-                $(".without-select").show();
-
-                $("#kassamode").val('0');
-                $("#moneymode").val('0');
-                $("#paymentsmode").val('1');
-                $("#paymode").val('0');
             }
         });
     }

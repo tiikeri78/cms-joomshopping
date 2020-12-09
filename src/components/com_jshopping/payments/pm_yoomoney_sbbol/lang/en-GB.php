@@ -14,7 +14,6 @@ define('_JSHOP_YOO_VERSION_DESCRIPTION','Module version ');
 
 define('_JSHOP_YOO_TAB_MONEY', 'YooMoney');
 define('_JSHOP_YOO_TAB_KASSA', 'YooMoney for business');
-define('_JSHOP_YOO_TAB_PAYMENTS', 'Billing');
 
 define('_JSHOP_YOO_KASSA_ON', 'Enable payment acceptance via YooMoney for business');
 define('_JSHOP_YOO_KASSA_HELP_CHECKURL', 'Only required if YooMoney for business\'s specialists ask for it');
@@ -84,16 +83,6 @@ define('_JSHOP_YOO_METHOD_CARDS2_DESCRIPTION', 'Bank cards');
 define('_JSHOP_YOO_COMMON_HEAD', 'Additional settings for administrator');
 define('_JSHOP_YOO_COMMON_STATUS', 'Order status after the payment');
 
-define('_JSHOP_YOO_PAYMENTS_HEAD', 'This is a payment form for your website. It allows accepting payments to the company\'s account from
-cards and YooMoney wallets, without a contract.<br />
-Setting up requires the form\'s ID: it will be indicated in the email once you
-<a href="https://yoomoney.ru/fastpay/" target="_blank">build the form in the constructor</a>.');
-
-define('_JSHOP_YOO_PAYMENTS_ON', 'Activate payments via Billing');
-define('_JSHOP_YOO_PAYMENTS_ID_LABEL', 'Form ID');
-define('_JSHOP_YOO_PAYMENTS_DESCRIPTION_LABEL', 'Payment purpose');
-define('_JSHOP_YOO_PAYMENTS_DESCRIPTION_PLACEHOLDER', 'Order No. %order_id% Payment via Billing');
-define('_JSHOP_YOO_PAYMENTS_DESCRIPTION_INFO', 'Payment purpose is added to the payment order: specify whatever will help identify the order paid via Billing');
 define('_JSHOP_YOO_PAYMENTS_STATUS_LABEL', 'Order status');
 define('_JSHOP_YOO_PAYMENTS_STATUS_INFO', 'The status should indicate that the result of the payment is unknown: you can only find out if the customer paid or not by checking the notification sent to your email or by contacting your bank.');
 define('_JSHOP_YOO_PAYMENTS_FIO_LABEL', 'Payer\'s full name');
@@ -109,7 +98,6 @@ define('_JSHOP_YOO_MODE_DESCRIPTION', 'Payment acceptance settings');
 define('_JSHOP_YOO_MODE1_DESCRIPTION', 'YooMoney');
 define('_JSHOP_YOO_MODE2_DESCRIPTION', 'YooMoney for business (On the store\'s site)');
 define('_JSHOP_YOO_MODE3_DESCRIPTION', 'YooMoney for business (On YooMoney for business\'s site)');
-define('_JSHOP_YOO_MODE4_DESCRIPTION', 'Billing (bank cards, e-money)');
 define('_JSHOP_YOO_REG_IND', 'If you don\'t have a YooMoney account, register here - <a href="https://yoomoney.ru/" target="_blank">https://yoomoney.ru/</a><br/><b>IMPORTANT!</b> Copy this link to the Redirect URL field at the <a href=\'https://yoomoney.ru/myservices/online.xml\' target=\'_blank\'>notifications settings page</a>.');
 
 define('_JSHOP_YOO_REG_ORG', "To start operating the module, connect your store to <a target=\"_blank\" href=\"https://yookassa.ru/en/\">YooMoney for business</a>. Shop ID, scid, ShopPassword can be found in the <a href='https://yookassa.ru/my' target='_blank'>Merchant Profile</a> after the onboarding process.");

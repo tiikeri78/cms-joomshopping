@@ -1,14 +1,14 @@
 #!/bin/bash
 
 GIT_HUB_PROJECT_PATH="$( cd "$(dirname "$0")" ; pwd )"
-ARCHIVE_FILE_NAME=yoomoney-cms-v2-joomshopping.zip
+ARCHIVE_FILE_NAME=cms-joomshopping.zip
 
 if [ -f "$ARCHIVE_FILE_NAME" ]; then
     rm -rf "$ARCHIVE_FILE_NAME";
 fi;
 
 cd src
-"C:\Program Files\7-Zip\7z.exe" a -r "../yoomoney-cms-v2-joomshopping.zip" ./*
+"C:\Program Files\7-Zip\7z.exe" a -r "../cms-joomshopping.zip" ./*
 
 cd ../
 rsync -av --delete src "$GIT_HUB_PROJECT_PATH";

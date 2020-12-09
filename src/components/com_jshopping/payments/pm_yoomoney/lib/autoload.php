@@ -10,9 +10,9 @@ define('YOOMONEY_MODULE_PATH', dirname(__FILE__));
 
 function yooMoneyLoadClass($className)
 {
-    if (strncmp('YooMoneyModule', $className, 14) === 0) {
+    if (strncmp('YooMoney', $className, 8) === 0) {
         $path = YOOMONEY_MODULE_PATH;
-        $length = 11;
+        $length = 8;
     } else {
         return;
     }

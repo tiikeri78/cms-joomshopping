@@ -47,7 +47,6 @@ function escapeValue($value)
 
         <?php include(dirname(__FILE__) . '/3x/yookassa.php'); ?>
         <?php include(dirname(__FILE__).'/3x/yoomoney.php'); ?>
-        <?php include(dirname(__FILE__) . '/3x/yoomoney_payments.php'); ?>
         <?php if (isset($newVersionInfo)) : ?>
             <?php include(dirname(__FILE__) . '/3x/yoomoney_update.php'); ?>
         <?php else: ?>

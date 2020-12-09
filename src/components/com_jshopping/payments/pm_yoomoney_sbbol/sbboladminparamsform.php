@@ -120,7 +120,7 @@ function escapeValue($value)
                 <div class="row">
                     <div class="span11 offset1">
                         <div class="span2"><label>Ставка в вашем магазине.</label></div>
-                        <p class="help-block">Слева — ставка НДС в вашем магазине, справа — в Яндекс.Кассе. Пожалуйста,
+                        <p class="help-block">Слева — ставка НДС в вашем магазине, справа — в ЮKassa. Пожалуйста,
                             сопоставьте их.</p>
                     </div>
                 </div>
@@ -129,7 +129,7 @@ function escapeValue($value)
                         <div class="span11 offset1">
                             <div class="form-group">
                                 <div class="span2"><label for="pm_params[yoo_sbbol_tax_<?php echo $k; ?>]"
-                                                          class=""><?php echo $tax; ?>% передавать в Яндекс.Кассу
+                                                          class=""><?php echo $tax; ?>% передавать в ЮKassa
                                         как</label></div>
                                 <div class="span8">
                                     <select name="pm_params[yoo_sbbol_tax_<?php echo $k; ?>]" class=" fixed-width-xl"

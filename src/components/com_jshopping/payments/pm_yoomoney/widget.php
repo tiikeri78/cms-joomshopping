@@ -1,6 +1,6 @@
 <script src="https://yookassa.ru/checkout-ui/v2.js"></script>
 <script>
-    const checkout = new window.YooKassa({
+    const checkout = new window.YooMoneyCheckoutWidget({
         confirmation_token: '<?= $token; ?>',
         return_url: '<?= $returnUrl; ?>',
         embedded_3ds: true,

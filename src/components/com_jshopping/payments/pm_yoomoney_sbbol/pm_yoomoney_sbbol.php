@@ -13,6 +13,7 @@ use YooKassa\Model\NotificationEventType;
 use YooKassa\Model\PaymentMethodType;
 use YooKassa\Model\PaymentStatus;
 use YooMoney\Model\KassaPaymentMethod;
+use YooMoney\Model\SbbolException;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -209,7 +210,7 @@ class pm_yoomoney_sbbol extends PaymentRoot
 
         try {
             $payment = $this->getKassaPaymentMethod($pmconfigs)->createSbbolPayment($order, $cart, $redirectUrl);
-        } catch (\SbbolException $e) {
+        } catch (SbbolException $e) {
             $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
             $app->enqueueMessage('У вас в корзине товары, для которых действуют разные ставки НДС — их нельзя оплатить одновременно. Можно разбить покупку на несколько этапов: сначала оплатить товары с одной ставкой НДС, потом — с другой.',
                 'error');

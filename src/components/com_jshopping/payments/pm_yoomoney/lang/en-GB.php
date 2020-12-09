@@ -54,7 +54,7 @@ define('_JSHOP_YOO_HOLD_MODE_CAPTURE_PAYMENT_FAIL', 'Payment wasn\'t captured. P
 define('_JSHOP_YOO_HOLD_MODE_CANCEL_PAYMENT_SUCCESS', 'You\'ve canceled a payment in YooMoney for business.  Money will be returned to the user.');
 define('_JSHOP_YOO_HOLD_MODE_CANCEL_PAYMENT_FAIL', 'Payment wasn\'t canceled. Please try again.');
 define('_JSHOP_YOO_DESCRIPTION_HELP', 'Full description of the transaction that the user will see during the checkout process. You can find it in your YooMoney for business Merchant Profile. For example, "Payment for order No. 72 by user@yoomoney.ru". Limitations: no more than 128 symbols.');
-define('_JSHOP_YOO_METHOD_YOOMONEY_DESCRIPTION', 'YooMoney');
+define('_JSHOP_YOO_METHOD_YOO_MONEY_DESCRIPTION', 'YooMoney');
 define('_JSHOP_YOO_METHOD_CARDS_DESCRIPTION', 'Bank cards');
 define('_JSHOP_YOO_METHOD_BANK_CARD_DESCRIPTION', 'Bank cards');
 define('_JSHOP_YOO_METHOD_CASH_DESCRIPTION', 'Cash via payment kiosks');
@@ -70,7 +70,7 @@ define('_JSHOP_YOO_METHOD_MP_DESCRIPTION', 'Mobile payment kiosk');
 define('_JSHOP_YOO_METHOD_WIDGET_DESCRIPTION', 'Payment widget from YooMoney for business (cards, Apple Pay and Google Play)');
 define('_JSHOP_YOO_METHOD_INSTALLMENTS_DESCRIPTION', 'Installments');
 
-define('_JSHOP_YOO_METHOD_YOOMONEY_DESCRIPTION_PUBLIC', 'YooMoney');
+define('_JSHOP_YOO_METHOD_YOO_MONEY_DESCRIPTION_PUBLIC', 'YooMoney');
 define('_JSHOP_YOO_METHOD_CARDS_DESCRIPTION_PUBLIC', 'Bank cards');
 define('_JSHOP_YOO_METHOD_BANK_CARD_DESCRIPTION_PUBLIC', 'Bank cards');
 define('_JSHOP_YOO_METHOD_CASH_DESCRIPTION_PUBLIC', 'Cash via payment kiosks');

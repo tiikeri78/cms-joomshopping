@@ -57,7 +57,7 @@ define('_JSHOP_YOO_KASSA_PAYMODE_LINK', '<a href=\'https://yookassa.ru/docs/paym
 define('_JSHOP_YOO_KASSA_SELECT_TEXT', 'Отметьте способы оплаты, которые указаны в вашем договоре с ЮMoney');
 define('_JSHOP_YOO_KASSA_CREDENTIALS_ERROR', 'Проверьте shopId и Секретный ключ — где-то есть ошибка. А лучше скопируйте их прямо из <a href="https://yookassa.ru/my/" target="_blank">личного кабинета ЮKassa</a>');
 define('_JSHOP_YOO_KASSA_TEST_WARNING', 'Вы включили тестовый режим приема платежей. Проверьте, как проходит оплата, и напишите менеджеру Кассы. Он выдаст рабочие shopId и Секретный ключ. <a href="https://yookassa.ru/docs/support/payments/onboarding/integration#api__04" target="_blank">Инструкция</a>');
-define('_JSHOP_YOO_METHOD_YOOMONEY_DESCRIPTION', 'ЮMoney');
+define('_JSHOP_YOO_METHOD_YOO_MONEY_DESCRIPTION', 'ЮMoney');
 define('_JSHOP_YOO_METHOD_CARDS_DESCRIPTION', 'Банковские карты');
 define('_JSHOP_YOO_METHOD_BANK_CARD_DESCRIPTION', 'Банковские карты');
 define('_JSHOP_YOO_METHOD_CASH_DESCRIPTION', 'Наличные через терминалы');

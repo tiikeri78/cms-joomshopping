@@ -16,6 +16,7 @@ use YooKassa\Model\PaymentMethodType;
 use YooKassa\Request\Payments\CreatePaymentRequest;
 use YooKassa\Request\Payments\Payment\CreateCaptureRequest;
 use YooKassa\Request\Payments\Payment\CreateCaptureRequestBuilder;
+use YooMoney\Model\SbbolException;
 
 require_once JPATH_ROOT.'/components/com_jshopping/payments/pm_yoomoney_sbbol/SbbolException.php';
 
@@ -178,7 +179,7 @@ class KassaPaymentMethod
      * @param $cart
      * @param $returnUrl
      * @return \YooKassa\Request\Payments\CreatePaymentResponse|null
-     * @throws \SbbolException
+     * @throws SbbolException
      */
     public function createSbbolPayment($order, $cart, $returnUrl)
     {
@@ -214,7 +215,7 @@ class KassaPaymentMethod
 
             $usedTaxes = array_unique($usedTaxes);
             if (count($usedTaxes) !== 1) {
-                throw new \SbbolException();
+                throw new SbbolException();
             }
 
             $paymentMethodData = new PaymentDataB2bSberbank();
@@ -241,7 +242,7 @@ class KassaPaymentMethod
             $builder->setConfirmation($confirmation);
             $builder->setPaymentMethodData($paymentMethodData);
             $request = $builder->build();
-        } catch (\SbbolException $e) {
+        } catch (SbbolException $e) {
             throw $e;
         } catch (\Exception $e) {
             $this->module->log('error', 'Failed to build request: '.$e->getMessage());

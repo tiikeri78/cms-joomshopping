@@ -20,7 +20,7 @@ class OrderModel
     {
         $query = $this->_db->getQuery(true);
         $query->select('payment_id')
-            ->from('#__yoo_money_payments')
+            ->from('#__yoomoney_payments')
             ->where($this->_db->quoteName('order_id') . ' = ' . (int)$orderId);
         $this->_db->setQuery($query);
         $record = $this->_db->loadRow();
@@ -35,7 +35,7 @@ class OrderModel
     {
         $query = $this->_db->getQuery(true);
         $query->select('payment_id')
-            ->from('#__yoo_money_payments')
+            ->from('#__yoomoney_payments')
             ->where($this->_db->quoteName('order_id') . ' = ' . (int)$orderId);
         $this->_db->setQuery($query);
         $record = $this->_db->loadRow();
@@ -57,7 +57,7 @@ class OrderModel
         }
 
         $query = $this->_db->getQuery(true);
-        $query->clear()->insert('#__yoo_money_payments')
+        $query->clear()->insert('#__yoomoney_payments')
             ->columns(
                 array(
                     $this->_db->quoteName('order_id'), $this->_db->quoteName('payment_id'),
@@ -97,7 +97,7 @@ class OrderModel
         }
 
         $query = $this->_db->getQuery(true);
-        $query->update('#__yoo_money_payments')
+        $query->update('#__yoomoney_payments')
             ->set(
                 $this->_db->quoteName('payment_id') . ' = ' . $this->_db->quote($payment->getId()) . ',' .
                 $this->_db->quoteName('status') . ' = ' . $this->_db->quote($payment->getStatus()) . ',' .

@@ -877,7 +877,7 @@ class pm_yoomoney extends PaymentRoot
         } catch (\Exception $e) {
             $redirect = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
             $app->enqueueMessage(_JSHOP_YOO_ERROR_MESSAGE_CREATE_PAYMENT, 'error');
-            $app->redirect($redirectUrl);
+            $app->redirect($redirect);
         }
 
         $redirect = $redirectUrl;

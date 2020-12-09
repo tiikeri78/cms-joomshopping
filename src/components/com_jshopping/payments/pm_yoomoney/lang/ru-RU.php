@@ -55,12 +55,12 @@ define('_JSHOP_YOO_HOLD_MODE_CAPTURE_PAYMENT_SUCCESS', 'Вы подтверди�
 define('_JSHOP_YOO_HOLD_MODE_CAPTURE_PAYMENT_FAIL', 'Платёж не подтвердился. Попробуйте ещё раз.');
 define('_JSHOP_YOO_HOLD_MODE_CANCEL_PAYMENT_SUCCESS', 'Вы отменили платёж в ЮKassa. Деньги вернутся клиенту.');
 define('_JSHOP_YOO_HOLD_MODE_CANCEL_PAYMENT_FAIL', 'Платёж не отменился. Попробуйте ещё раз.');
-define('_JSHOP_YOO_KASSA_PAYMODE_KASSA', 'На стороне Юkassa');
+define('_JSHOP_YOO_KASSA_PAYMODE_KASSA', 'На стороне ЮKassa');
 define('_JSHOP_YOO_KASSA_PAYMODE_SHOP', 'На стороне магазина');
 define('_JSHOP_YOO_KASSA_PAYMODE_LINK', '<a href=\'https://yookassa.ru/docs/payment-solution/payment-form/basics/\' target=\'_blank\'>Подробнее о сценариях оплаты</a>');
 define('_JSHOP_YOO_KASSA_SELECT_TEXT', 'Отметьте способы оплаты, которые указаны в вашем договоре с ЮMoney');
 define('_JSHOP_YOO_KASSA_CREDENTIALS_ERROR', 'Проверьте shopId и Секретный ключ — где-то есть ошибка. А лучше скопируйте их прямо из <a href="https://yookassa.ru/my" target="_blank">личного кабинета ЮKassa</a>');
-define('_JSHOP_YOO_KASSA_TEST_WARNING', 'Вы включили тестовый режим приема платежей. Проверьте, как проходит оплата, и напишите менеджеру Юkassa. Он выдаст рабочие shopId и Секретный ключ. <a href="https://yookassa.ru/docs/support/payments/onboarding/integration#api__04" target="_blank">Инструкция</a>');
+define('_JSHOP_YOO_KASSA_TEST_WARNING', 'Вы включили тестовый режим приема платежей. Проверьте, как проходит оплата, и напишите менеджеру ЮKassa. Он выдаст рабочие shopId и Секретный ключ. <a href="https://yookassa.ru/docs/support/payments/onboarding/integration#api__04" target="_blank">Инструкция</a>');
 
 define('_JSHOP_YOO_METHOD_YOO_MONEY_DESCRIPTION', 'ЮMoney');
 define('_JSHOP_YOO_METHOD_CARDS_DESCRIPTION', 'Банковские карты');
@@ -76,11 +76,11 @@ define('_JSHOP_YOO_METHOD_PB_DESCRIPTION', 'Интернет-банк Промс
 define('_JSHOP_YOO_METHOD_QIWI_DESCRIPTION', 'QIWI Wallet');
 define('_JSHOP_YOO_METHOD_QP_DESCRIPTION', 'Доверительный платеж (Куппи.ру)');
 define('_JSHOP_YOO_METHOD_MP_DESCRIPTION', 'Мобильный терминал');
-define('_JSHOP_YOO_METHOD_WIDGET_DESCRIPTION', 'Платёжный виджет Юkassa (карты, Apple Pay и Google Pay)');
+define('_JSHOP_YOO_METHOD_WIDGET_DESCRIPTION', 'Платёжный виджет ЮKassa (карты, Apple Pay и Google Pay)');
 define('_JSHOP_YOO_METHOD_INSTALLMENTS_DESCRIPTION', 'Заплатить по частям');
 
 
-define('_JSHOP_YOO_INSTALL_VERIFY_APPLE_PAY_FILE_WARNING', 'Чтобы покупатели могли заплатить вам через Apple Pay, <a href="https://yookassa.ru/docs/merchant.ru.yoomoney">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href="https://yookassa.ru/my/payment-methods/settings#applePay">в личном кабинете Юkassa</a>. <a href="https://yookassa.ru/developers/payment-forms/widget#apple-pay-configuration">Почитать о подключении Apple Pay в документации Юkassa</a>');
+define('_JSHOP_YOO_INSTALL_VERIFY_APPLE_PAY_FILE_WARNING', 'Чтобы покупатели могли заплатить вам через Apple Pay, <a href="https://yookassa.ru/docs/merchant.ru.yoomoney">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href="https://yookassa.ru/my/payment-methods/settings#applePay">в личном кабинете ЮKassa</a>. <a href="https://yookassa.ru/developers/payment-forms/widget#apple-pay-configuration">Почитать о подключении Apple Pay в документации ЮKassa</a>');
 
 define('_JSHOP_YOO_METHOD_YOO_MONEY_DESCRIPTION_PUBLIC', 'ЮMoney');
 define('_JSHOP_YOO_METHOD_CARDS_DESCRIPTION_PUBLIC', 'Банковские карты');

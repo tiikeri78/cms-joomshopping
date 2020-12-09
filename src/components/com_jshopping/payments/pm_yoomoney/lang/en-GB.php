@@ -85,7 +85,7 @@ define('_JSHOP_YOO_METHOD_MP_DESCRIPTION_PUBLIC', 'Mobile payment kiosk');
 define('_JSHOP_YOO_METHOD_WIDGET_DESCRIPTION_PUBLIC', 'Bank cards, Apple Pay, Google Play');
 define('_JSHOP_YOO_METHOD_INSTALLMENTS_DESCRIPTION_PUBLIC', 'Installments');
 
-define('_JSHOP_YOO_INSTALL_VERIFY_APPLE_PAY_FILE_WARNING', 'Чтобы покупатели могли заплатить вам через Apple Pay, <a href="https://yookassa.ru/docs/merchant.ru.yoomoney">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href="https://yookassa.ru/my/payment-methods/settings#applePay">в личном кабинете Юkassa</a>. <a href="https://yookassa.ru/developers/payment-forms/widget#apple-pay-configuration">Почитать о подключении Apple Pay в документации Юkassa</a>');
+define('_JSHOP_YOO_INSTALL_VERIFY_APPLE_PAY_FILE_WARNING', 'Чтобы покупатели могли заплатить вам через Apple Pay, <a href="https://yookassa.ru/docs/merchant.ru.yoomoney">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href="https://yookassa.ru/my/payment-methods/settings#applePay">в личном кабинете ЮKassa</a>. <a href="https://yookassa.ru/developers/payment-forms/widget#apple-pay-configuration">Почитать о подключении Apple Pay в документации ЮKassa</a>');
 
 define('_JSHOP_YOO_METHOD_INSTALLMENTS_AMOUNT', ' (%s ₽ per month)');
 

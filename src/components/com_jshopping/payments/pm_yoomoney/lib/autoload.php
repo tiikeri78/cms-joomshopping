@@ -4,7 +4,7 @@ if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
 
-require_once dirname(__FILE__) . DS . 'yookassa-sdk-php/lib' . DS . 'autoload.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 define('YOOMONEY_MODULE_PATH', dirname(__FILE__));
 

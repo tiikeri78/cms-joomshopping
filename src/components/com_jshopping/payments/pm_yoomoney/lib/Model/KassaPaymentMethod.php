@@ -310,8 +310,9 @@ class KassaPaymentMethod
         $defaultTaxRate  = $this->defaultTaxRateId;
         if (!empty($order->email)) {
             $builder->setReceiptEmail($order->email);
-        } else {
-            $builder->setReceiptPhone($order->phone);
+        }
+        if (!empty($order->phone)) {
+            $builder->setReceiptPhone(preg_replace('/\D/', '', $order->phone));
         }
         $shipping = false;
         foreach ($shippingMethods as $tmp) {

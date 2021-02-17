@@ -209,8 +209,6 @@ class KassaPaymentMethod
                         $usedTaxes[] = $pmconfigs['yoo_sbbol_default_tax'];
                     }
                 }
-            } else {
-
             }
 
             $usedTaxes = array_unique($usedTaxes);

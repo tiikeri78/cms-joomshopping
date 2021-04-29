@@ -253,6 +253,7 @@ class pm_yoomoney extends PaymentRoot
             'yookassa_description_template',
             'yookassa_send_check',
             'yookassa_default_tax',
+            'yookassa_default_tax_system',
             'method_mp',
             'debug_log',
             'yookassa_default_payment_mode',

@@ -33,7 +33,7 @@ use YooKassa\Helpers\TypeCast;
 use YooKassa\Model\PaymentMethodType;
 
 /**
- * Класс, описывающий метод оплаты, при оплате через Сбербанк Онлайн
+ * Класс, описывающий метод оплаты, при оплате через SberPay
  *
  * @property string $type Тип объекта
  * @property string $phone Телефон пользователя

@@ -34,7 +34,7 @@ use YooKassa\Model\PaymentMethodType;
 
 /**
  * PaymentDataSberbank
- * Платежные данные для проведения оплаты при помощи Сбербанк Онлайн.
+ * Платежные данные для проведения оплаты при помощи SberPay.
  * @property string $phone
  */
 class PaymentDataSberbank extends AbstractPaymentData

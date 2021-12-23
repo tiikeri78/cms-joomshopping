@@ -175,7 +175,10 @@ abstract class AbstractPaymentResponse extends Payment implements PaymentInterfa
             $this->setCancellationDetails(new CancellationDetails($party, $reason));
         }
         if (!empty($sourceArray['authorization_details'])) {
-            $this->setAuthorizationDetails(new AuthorizationDetails($sourceArray['authorization_details']));
+            $authorizationDetails = $sourceArray['authorization_details'];
+            $rrn                  = isset($authorizationDetails['rrn']) ? $authorizationDetails['rrn'] : null;
+            $authCode             = isset($authorizationDetails['auth_code']) ? $authorizationDetails['auth_code'] : null;
+            $this->setAuthorizationDetails(new AuthorizationDetails($rrn, $authCode));
         }
         if (!empty($sourceArray['transfers'])) {
             $transfers = array();

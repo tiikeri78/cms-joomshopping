@@ -5,89 +5,65 @@ namespace Tests\YooKassa\Model;
 use PHPUnit\Framework\TestCase;
 use YooKassa\Helpers\Random;
 use YooKassa\Model\AuthorizationDetails;
-use YooKassa\Model\ThreeDSecure;
 
 class AuthorizationDetailsTest extends TestCase
 {
     /**
-     * @param array $authorizationDetails
+     * @param null $rrn
+     * @param null $authCode
      * @return AuthorizationDetails
      */
-    protected static function getInstance($authorizationDetails = array('three_d_secure' => array('applied' => false)))
+    protected static function getInstance($rrn = null, $authCode = null)
     {
-        return new AuthorizationDetails($authorizationDetails);
+        return new AuthorizationDetails($rrn, $authCode);
     }
 
     /**
      * @dataProvider validDataProvider
      *
-     * @param array $authorizationDetails
+     * @param $rrn
+     * @param $authCode
      */
-    public function testConstructor($authorizationDetails)
+    public function testConstructor($rrn = null, $authCode = null)
     {
-        $instance = self::getInstance($authorizationDetails);
+        $instance = self::getInstance($rrn, $authCode);
 
-        self::assertEquals($authorizationDetails['rrn'], $instance->getRrn());
-        self::assertEquals($authorizationDetails['auth_code'], $instance->getAuthCode());
-        self::assertInstanceOf('YooKassa\\Model\\ThreeDSecure', $instance->getThreeDSecure());
+        self::assertEquals($rrn, $instance->getRrn());
+        self::assertEquals($authCode, $instance->getAuthCode());
     }
 
     /**
      * @dataProvider validDataProvider
      *
-     * @param array $authorizationDetails
+     * @param $rrn
+     * @param $authCode
      */
-    public function testGetSetRrn($authorizationDetails)
+    public function testGetSetRrn($rrn = null, $authCode = null)
     {
-        $instance = self::getInstance($authorizationDetails);
-        self::assertEquals($authorizationDetails['rrn'], $instance->getRrn());
+        $instance = self::getInstance($rrn, $authCode);
+        self::assertEquals($rrn, $instance->getRrn());
 
-        $instance = self::getInstance($authorizationDetails);
-        $instance->setRrn($authorizationDetails['rrn']);
-        self::assertEquals($authorizationDetails['rrn'], $instance->getRrn());
-        self::assertEquals($authorizationDetails['rrn'], $instance->rrn);
+        $instance = self::getInstance();
+        $instance->setRrn($rrn);
+        self::assertEquals($rrn, $instance->getRrn());
+        self::assertEquals($rrn, $instance->rrn);
     }
 
     /**
      * @dataProvider validDataProvider
      *
-     * @param array $authorizationDetails
+     * @param null $rrn
+     * @param null $authCode
      */
-    public function testGetSetAuthCode($authorizationDetails)
+    public function testGetSetAuthCode($rrn = null, $authCode = null)
     {
-        $instance = self::getInstance($authorizationDetails);
-        self::assertEquals($authorizationDetails['auth_code'], $instance->getAuthCode());
+        $instance = self::getInstance($rrn, $authCode);
+        self::assertEquals($authCode, $instance->getAuthCode());
 
-        $instance = self::getInstance($authorizationDetails);
-        $instance->setAuthCode($authorizationDetails['auth_code']);
-        self::assertEquals($authorizationDetails['auth_code'], $instance->getAuthCode());
-        self::assertEquals($authorizationDetails['auth_code'], $instance->authCode);
-    }
-
-    /**
-     * @dataProvider validDataProvider
-     *
-     * @param array $authorizationDetails
-     */
-    public function testGetSetThreeDSecure($authorizationDetails)
-    {
-        $instance = self::getInstance($authorizationDetails);
-        self::assertInstanceOf('YooKassa\\Model\\ThreeDSecure', $instance->getThreeDSecure());
-
-        $instance = self::getInstance($authorizationDetails);
-        $instance->setThreeDSecure($authorizationDetails['three_d_secure']);
-
-        if (is_object($authorizationDetails['three_d_secure'])) {
-            $threeDSecureObj = $authorizationDetails['three_d_secure'];
-            $threeDSecureExpect = $threeDSecureObj->getApplied();
-        } else {
-            $threeDSecureExpect = $authorizationDetails['three_d_secure']['applied'];
-        }
-
-        self::assertInstanceOf('YooKassa\\Model\\ThreeDSecure', $instance->getThreeDSecure());
-        self::assertInstanceOf('YooKassa\\Model\\ThreeDSecure', $instance->threeDSecure);
-
-        self::assertEquals($threeDSecureExpect, $instance->getThreeDSecure()->getApplied());
+        $instance = self::getInstance();
+        $instance->setAuthCode($authCode);
+        self::assertEquals($authCode, $instance->getAuthCode());
+        self::assertEquals($authCode, $instance->authCode);
     }
 
     /**
@@ -121,64 +97,27 @@ class AuthorizationDetailsTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidValueDataProvider
-     * @param mixed $value
-     * @param string $exceptionClassName
-     */
-    public function testSetterInvalidThreeDSecure($value, $exceptionClassName)
-    {
-        $instance = self::getInstance();
-        try {
-            $instance->setThreeDSecure($value);
-        } catch (\Exception $e) {
-            self::assertInstanceOf($exceptionClassName, $e);
-        }
-    }
-
-    /**
      * @return array
      * @throws \Exception
      */
     public function validDataProvider()
     {
-       return array(
+        $result = array(
             array(
-                'authorizationDetails' => array(
-                    'rrn'      => null,
-                    'auth_code' => null,
-                    'three_d_secure' => array(
-                        'applied' => false
-                    )
-                )
+                'rrn'      => null,
+                'authCode' => null,
             ),
             array(
-                'authorizationDetails' => array(
-                    'rrn'      => '',
-                    'auth_code' => '',
-                    'three_d_secure' => array(
-                        'applied' => false
-                    )
-                )
+                'rrn'      => '',
+                'authCode' => '',
             ),
             array(
-                'authorizationDetails' => array(
-                    'rrn'      => Random::str(32),
-                    'auth_code' => Random::str(32),
-                    'three_d_secure' => array(
-                        'applied' => true
-                    )
-                )
+                'rrn'      => Random::str(32),
+                'authCode' => Random::str(32),
             ),
-           array(
-               'authorizationDetails' => array(
-                   'rrn'      => Random::str(32),
-                   'auth_code' => Random::str(32),
-                   'three_d_secure' => new ThreeDSecure(array(
-                       'applied' => true
-                   ))
-               )
-           )
         );
+
+        return $result;
     }
 
     public function invalidValueDataProvider()
@@ -192,28 +131,22 @@ class AuthorizationDetailsTest extends TestCase
             array(0.0, $exceptionNamespace.'InvalidPropertyValueTypeException'),
             array(true, $exceptionNamespace.'InvalidPropertyValueTypeException'),
             array(false, $exceptionNamespace.'InvalidPropertyValueTypeException'),
-            array(new \StdClass, $exceptionNamespace.'InvalidPropertyValueTypeException'),
         );
     }
 
     /**
      * @dataProvider validDataProvider
      *
-     * @param array $authorizationDetails
+     * @param null $rrn
+     * @param null $authCode
      */
-    public function testJsonSerialize($authorizationDetails)
+    public function testJsonSerialize($rrn = null, $authCode = null)
     {
-        $instance = new AuthorizationDetails($authorizationDetails);
-
+        $instance = new AuthorizationDetails($rrn, $authCode);
         $expected = array(
-            'rrn'       => $authorizationDetails['rrn'],
-            'auth_code' => $authorizationDetails['auth_code'],
-            'three_d_secure' =>
-                is_object($authorizationDetails['three_d_secure'])
-                    ? $authorizationDetails['three_d_secure']->jsonSerialize()
-                    : $authorizationDetails['three_d_secure']
+            'rrn'       => $rrn,
+            'auth_code' => $authCode,
         );
-
         self::assertEquals($expected, $instance->jsonSerialize());
     }
 }

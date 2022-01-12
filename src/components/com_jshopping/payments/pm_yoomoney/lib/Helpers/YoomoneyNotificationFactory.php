@@ -5,7 +5,10 @@ namespace YooMoney\Helpers;
 use YooKassa\Model\Notification\NotificationFactory;
 use YooKassa\Model\Notification\AbstractNotification;
 
-class YoomoneyNotificationHelper
+/**
+ * Класс-фабрика для получения объекта уведомления от Юkassa
+ */
+class YoomoneyNotificationFactory
 {
 
     /**
@@ -24,6 +27,9 @@ class YoomoneyNotificationHelper
     }
 
     /**
+     * Возвращает объект уведомления от Юkassa, если он был получен ранее, или сначала
+     * преобразует уведомление от Юkassa в объект
+     *
      * @return AbstractNotification
      * @throws \Exception
      */
@@ -55,6 +61,11 @@ class YoomoneyNotificationHelper
         return $notification;
     }
 
+    /**
+     * Сеттер для объекта уведомления
+     *
+     * @param $object
+     */
     private function setNotificationObj($object)
     {
         $this->notificationObject = $object;

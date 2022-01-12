@@ -5,6 +5,9 @@ namespace YooMoney\Helpers;
 use YooMoney\Model\KassaSecondReceiptModel;
 use YooMoney\Model\OrderModel;
 
+/**
+ * Класс методов для работы с чеками
+ */
 class ReceiptHelper
 {
     /**
@@ -23,6 +26,8 @@ class ReceiptHelper
     }
 
     /**
+     * Выполняет отправку второго чека
+     *
      * @param $orderId
      * @param $kassa
      * @param $status
@@ -73,6 +78,8 @@ class ReceiptHelper
     }
 
     /**
+     * Проверка условий необходимости отправки второго чека
+     *
      * @param $status
      * @param $isSendReceipt
      * @param $isSendSecondReceipt

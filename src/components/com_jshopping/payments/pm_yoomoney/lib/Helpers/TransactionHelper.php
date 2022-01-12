@@ -7,6 +7,9 @@ use YooKassa\Model\PaymentStatus;
 use YooKassa\Model\PaymentMethodType;
 use YooMoney\Model\KassaPaymentMethod;
 
+/**
+ * В классе объединены методы для обработки входящих уведомлений от Юkassa
+ */
 class TransactionHelper
 {
     const CANCELED_STATUS_ID = 3;
@@ -28,18 +31,27 @@ class TransactionHelper
     private $receiptHelper;
 
     /**
-     * @var YoomoneyNotificationHelper
+     * @var YoomoneyNotificationFactory
      */
     private $yooNotificationHelper;
 
     public function __construct()
     {
         $this->logger = new Logger();
-        $this->yooNotificationHelper = new YoomoneyNotificationHelper();
+        $this->yooNotificationHelper = new YoomoneyNotificationFactory();
         $this->orderHelper = new OrderHelper();
         $this->receiptHelper = new ReceiptHelper();
     }
 
+    /**
+     * Обрабатывает уведомление от Юkassa в зависимости от статуса платежа в уведомлении
+     *
+     * @param $kassa
+     * @param $pmConfigs
+     * @param $order
+     * @return bool|void
+     * @throws \Exception
+     */
     public function processNotification($kassa, $pmConfigs, $order)
     {
         $notificationObj = $this->yooNotificationHelper->getNotificationObject();
@@ -112,6 +124,8 @@ class TransactionHelper
     }
 
     /**
+     * Выполняет действия, если получено уведомление о статусе payment.succeeded
+     *
      * @param $pmConfigs
      * @param $order
      * @param $payment
@@ -160,6 +174,8 @@ class TransactionHelper
     }
 
     /**
+     * Возвращает сообщение для истории статусов заказа, если тип платежа b2b_sberbank
+     *
      * @param $paymentMethod
      * @return string
      */
@@ -180,7 +196,6 @@ class TransactionHelper
         );
         $message = '';
         foreach ($fields as $field => $caption) {
-            // TODO: $requestData - ???
             if (isset($requestData[$field])) {
                 $message .= $caption.': '.$payerBankDetails->offsetGet($field).'\n';
             }
@@ -188,6 +203,15 @@ class TransactionHelper
         return $message;
     }
 
+    /**
+     * Выполняет действия, если получено уведомление о статусе payment.waiting_for_capture
+     *
+     * @param $pmConfigs
+     * @param $order
+     * @param $payment
+     * @param $kassa
+     * @param $notificationObj
+     */
     private function processWaitingForCaptureNtfctn($pmConfigs, $order, $payment, $kassa, $notificationObj)
     {
         if ($kassa->isEnableHoldMode()) {
@@ -215,6 +239,13 @@ class TransactionHelper
         }
     }
 
+    /**
+     * Выполняет действия, если получено уведомление о статусе payment.canceled и включен режим холдирования
+     *
+     * @param $pmConfigs
+     * @param $order
+     * @param $payment
+     */
     private function processCanceledHoldPaymentNtfctn($pmConfigs, $order, $payment)
     {
         $this->logger->log('info', 'Canceled hold payment ' . $payment->getId());
@@ -228,6 +259,11 @@ class TransactionHelper
         $checkout->changeStatusOrder($order->order_id, $cancelHoldStatus, 0);
     }
 
+    /**
+     * Выполняет действия, если получено уведомление о статусе payment.canceled
+     *
+     * @param $order
+     */
     private function processCanceledPaymentNtfctn($order)
     {
         /** @var jshopCheckout $checkout */
@@ -239,6 +275,11 @@ class TransactionHelper
         $checkout->changeStatusOrder($order->order_id, self::CANCELED_STATUS_ID, 0);
     }
 
+    /**
+     * Выполняет действия, если получено уведомление о статусе refund.succeeded
+     *
+     * @param $order
+     */
     private function processRefundNtfctn($order)
     {
         /** @var jshopCheckout $checkout */

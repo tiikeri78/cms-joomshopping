@@ -2,6 +2,9 @@
 
 namespace YooMoney\Helpers;
 
+/**
+ * В данный класс вынесены функции, для совместимости модуля Yoomoney с версиями Joomla! 3.* и 4.*
+ */
 class JVersionDependenciesHelper
 {
     private $joomlaVersion;
@@ -13,6 +16,8 @@ class JVersionDependenciesHelper
     }
 
     /**
+     * Возвращает версию Joomla! от 2 до 4 версии
+     *
      * @return int
      */
     public function getJoomlaVersion()
@@ -20,6 +25,11 @@ class JVersionDependenciesHelper
         return $this->joomlaVersion;
     }
 
+    /**
+     * Функция-обертка для getJsDate()
+     *
+     * @return mixed
+     */
     public function getJsDate()
     {
         if ($this->joomlaVersion == 4) {
@@ -29,6 +39,11 @@ class JVersionDependenciesHelper
         return getJsDate();
     }
 
+    /**
+     * Функция-обертка для получения инстанса \Joomla\Component\Jshopping\Site\Table\AddonTable
+     *
+     * @return mixed
+     */
     public function getAddonTableObj()
     {
         if (JVERSION == 4) {
@@ -42,6 +57,9 @@ class JVersionDependenciesHelper
     }
 
     /**
+     * Возвращает составную часть имени файлов и директорий в зависимости от версии Joomla!
+     * Необходимо для получения шаблонов формы для модуля в админ-панели для конкретной версии Joomla!
+     *
      * @return string
      */
     public function getFilesVersionPostfix()
@@ -57,8 +75,10 @@ class JVersionDependenciesHelper
     }
 
     /**
-     * @param string $eventName
-     * @param array $listenerData
+     * Функция-обертка для регистрации обработчика события
+     *
+     * @param string $eventName - название события
+     * @param array $listenerData - обработчик
      */
     public function registerEventListener($eventName, $listenerData)
     {
@@ -74,6 +94,8 @@ class JVersionDependenciesHelper
     }
 
     /**
+     * Функция-обертка для getSefLink()
+     *
      * @param string $link
      * @return mixed
      */

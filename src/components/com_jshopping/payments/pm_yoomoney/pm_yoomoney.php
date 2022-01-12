@@ -20,7 +20,7 @@ use YooMoney\Helpers\ReceiptHelper;
 use YooMoney\Helpers\Logger;
 use YooMoney\Helpers\TransactionHelper;
 use YooMoney\Helpers\JVersionDependenciesHelper;
-use YooMoney\Helpers\YoomoneyNotificationHelper;
+use YooMoney\Helpers\YoomoneyNotificationFactory;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -63,7 +63,7 @@ class pm_yoomoney extends PaymentRoot
     private $versionHelper;
 
     /**
-     * @var YoomoneyNotificationHelper
+     * @var YoomoneyNotificationFactory
      */
     private $yooNotificationHelper;
 
@@ -104,7 +104,7 @@ class pm_yoomoney extends PaymentRoot
         $this->versionHelper = new JVersionDependenciesHelper();
         $this->logger = new Logger();
         $this->transactionHelper = new TransactionHelper();
-        $this->yooNotificationHelper = new YoomoneyNotificationHelper();
+        $this->yooNotificationHelper = new YoomoneyNotificationFactory();
         $this->receiptHelper = new ReceiptHelper();
         $this->orderHelper = new OrderHelper();
     }
@@ -434,6 +434,11 @@ class pm_yoomoney extends PaymentRoot
         exit();
     }
 
+    /**
+     * Возвращает путь к файлу лога
+     *
+     * @return string
+     */
     private function getLogFileName()
     {
         return $this->logger->getLogFileName();
@@ -901,6 +906,9 @@ class pm_yoomoney extends PaymentRoot
     }
 
     /**
+     * Возвращает id заказа по значению metadata.order_id в уведомлении, или, если уведомление о статусе
+     * refund.succeeded, то вызывает метод поиска refund.succeeded в БД по id платежа
+     *
      * @param AbstractNotification $notification
      * @return string
      * @throws Exception
@@ -923,6 +931,8 @@ class pm_yoomoney extends PaymentRoot
     }
 
     /**
+     * Проверяет, что платеж существует для переданного id заказа и оплачен
+     *
      * @param $orderId
      * @param $pmConfigs
      * @return bool

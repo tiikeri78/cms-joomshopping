@@ -2,6 +2,9 @@
 
 namespace YooMoney\Helpers;
 
+/**
+ * Класс методов для работы с заказами
+ */
 class OrderHelper
 {
     /**
@@ -14,6 +17,13 @@ class OrderHelper
         $this->dependenciesHelper = new JVersionDependenciesHelper();
     }
 
+    /**
+     * Сохраняет запись в истории к заказу
+     *
+     * @param $order
+     * @param $comments
+     * @return mixed
+     */
     public function saveOrderHistory($order, $comments)
     {
         $history                    = \JSFactory::getTable('orderHistory', 'jshop');

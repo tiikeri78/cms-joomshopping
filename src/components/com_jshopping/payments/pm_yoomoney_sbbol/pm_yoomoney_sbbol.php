@@ -318,6 +318,8 @@ class pm_yoomoney_sbbol extends PaymentRoot
     }
 
     /**
+     * Проверяет, что платеж существует для переданного id заказа и оплачен
+     *
      * @param $orderId
      * @param $pmConfigs
      * @return bool
@@ -367,6 +369,11 @@ class pm_yoomoney_sbbol extends PaymentRoot
         $this->logger->log($level, $message, $context);
     }
 
+    /**
+     * Возвращает путь к файлу лога
+     *
+     * @return string
+     */
     private function getLogFileName()
     {
         return $this->logger->getLogFileName();

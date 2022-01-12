@@ -7,13 +7,11 @@
  * @copyright Copyright (C) 2020 YooMoney. All rights reserved.
  */
 
-use YooKassa\Model\Notification\NotificationSucceeded;
-use YooKassa\Model\Notification\NotificationWaitingForCapture;
-use YooKassa\Model\NotificationEventType;
-use YooKassa\Model\PaymentMethodType;
-use YooKassa\Model\PaymentStatus;
 use YooMoney\Model\KassaPaymentMethod;
 use YooMoney\Model\SbbolException;
+use YooMoney\Helpers\Logger;
+use YooMoney\Helpers\TransactionHelper;
+use YooMoney\Helpers\JVersionDependenciesHelper;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -27,12 +25,27 @@ class pm_yoomoney_sbbol extends PaymentRoot
 {
     private $orderModel;
     private $kassa;
-    private $joomlaVersion;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @var TransactionHelper
+     */
+    private $transactionHelper;
+
+    /**
+     * @var JVersionDependenciesHelper
+     */
+    private $versionHelper;
 
     public function __construct()
     {
-        $this->joomlaVersion = (version_compare(JVERSION, '3.0', '<') == 1) ? 2 : 3;
-        $this->joomlaVersion = (version_compare(JVERSION, '4.0', '<') == 1) ? $this->joomlaVersion : 4;
+        $this->versionHelper = new JVersionDependenciesHelper();
+        $this->logger = new Logger();
+        $this->transactionHelper = new TransactionHelper();
     }
 
     function showPaymentForm($params, $pmconfigs)
@@ -151,14 +164,9 @@ class pm_yoomoney_sbbol extends PaymentRoot
         $params['articles'] = $this->getArticlesList();
         $this->loadLanguageFile();
         $orders     = JModelLegacy::getInstance('orders', 'JshoppingModel'); //admin model
-        $filename   = '';
-        if ($this->joomlaVersion === 3) {
-            $filename = '3x';
-            $dispatcher = JDispatcher::getInstance();
-            $dispatcher->register('onBeforeEditPayments', array($this, 'onBeforeEditPayments'));
-        } else {
-            JFactory::getApplication()->getDispatcher()->addListener('onBeforeEditPayments', array($this, 'onBeforeEditPayments'));
-        }
+
+        $filename = $this->versionHelper->getFilesVersionPostfix();
+        $this->versionHelper->registerEventListener('onBeforeEditPayments', array($this, 'onBeforeEditPayments'));
 
         include(dirname(__FILE__)."/sbboladminparamsform".$filename.".php");
     }
@@ -207,7 +215,7 @@ class pm_yoomoney_sbbol extends PaymentRoot
 
 
         $redirectUrl = $uri->toString(array('scheme', 'host', 'port'))
-            .$this->getSefLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yoomoney&no_lang=1&order_id=".$order->order_id);
+            .$this->versionHelper->getSefLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yoomoney&no_lang=1&order_id=".$order->order_id);
         $redirectUrl = htmlspecialchars_decode($redirectUrl);
 
         try {
@@ -269,128 +277,77 @@ class pm_yoomoney_sbbol extends PaymentRoot
      */
     function checkTransaction($pmConfigs, $order, $act)
     {
+        $kassa = $this->getKassaPaymentMethod($pmConfigs);
+
         if ($act === 'notify') {
             $this->log('debug', 'Notification callback called');
-            $source = file_get_contents('php://input');
-            $this->log('debug', 'Notification body: '.$source);
-            if (empty($source)) {
-                $this->log('debug', 'Notification error: body is empty!');
-                header('HTTP/1.1 400 Body is empty');
-                die();
+
+            try {
+                $result = $this->transactionHelper->processNotification($kassa, $pmConfigs, $order);
+            } catch (Exception $e) {
+                $this->log('debug', $e->getMessage());
+                header('HTTP/1.1 500 Internal Server Error');
+                die;
             }
-            $json = json_decode($source, true);
-            if (empty($json)) {
-                $this->log('debug', 'Notification error: invalid body!');
-                header('HTTP/1.1 400 Invalid body');
-                die();
-            }
-            $kassa        = $this->getKassaPaymentMethod($pmConfigs);
-            $notification = ($json['event'] === NotificationEventType::PAYMENT_SUCCEEDED)
-                ? new NotificationSucceeded($json)
-                : new NotificationWaitingForCapture($json);
-            $payment      = $kassa->fetchPayment($notification->getObject()->getId());
-            if (!$payment) {
-                $this->log('debug', 'Notification error: payment not exist');
-                header('HTTP/1.1 404 Payment not exists');
-                die();
+            if (!$result) {
+                $this->log('debug', 'Notification error: wrong payment status');
+                header('HTTP/1.1 401 Payment does not exists');
             }
 
-            if ($notification->getEvent() === NotificationEventType::PAYMENT_SUCCEEDED
-                && $payment->getStatus() === PaymentStatus::SUCCEEDED
-            ) {
-                try {
-                    $jshopConfig = JSFactory::getConfig();
-
-                    /** @var jshopCheckout $checkout */
-                    $checkout             = JSFactory::getModel('checkout', 'jshop');
-                    $endStatus            = $pmConfigs['transaction_end_status'];
-                    $order->order_created = 1;
-                    $order->order_status  = $endStatus;
-                    $order->store();
-                    try {
-                        if ($jshopConfig->send_order_email) {
-                            $checkout->sendOrderEmail($order->order_id);
-                        }
-                    } catch (\Exception $exception) {
-                        $this->log('debug', $exception->getMessage());
-                    }
-                    if ($jshopConfig->order_stock_removed_only_paid_status) {
-                        $product_stock_removed = in_array($endStatus,
-                            $jshopConfig->payment_status_enable_download_sale_file);
-                    } else {
-                        $product_stock_removed = 1;
-                    }
-                    if ($product_stock_removed) {
-                        $order->changeProductQTYinStock("-");
-                    }
-                    $checkout->changeStatusOrder($order->order_id, $endStatus, 0);
-                    $message = '';
-                    $paymentMethod = $payment->getPaymentMethod();
-                    if($paymentMethod->getType() == PaymentMethodType::B2B_SBERBANK) {
-                        $payerBankDetails = $payment->getPaymentMethod()->getPayerBankDetails();
-
-                        $fields  = array(
-                            'fullName'   => 'Полное наименование организации',
-                            'shortName'  => 'Сокращенное наименование организации',
-                            'adress'     => 'Адрес организации',
-                            'inn'        => 'ИНН организации',
-                            'kpp'        => 'КПП организации',
-                            'bankName'   => 'Наименование банка организации',
-                            'bankBranch' => 'Отделение банка организации',
-                            'bankBik'    => 'БИК банка организации',
-                            'account'    => 'Номер счета организации',
-                        );
-
-                        foreach ($fields as $field => $caption) {
-                            if (isset($requestData[$field])) {
-                                $message .= $caption.': '.$payerBankDetails->offsetGet($field).'\n';
-                            }
-                        }
-                    }
-
-                    if (!empty($message)) {
-                        $this->saveOrderHistory($order, $message);
-                    }
-                } catch (Exception $e) {
-                    $this->log('debug', $e->getMessage());
-                    header('HTTP/1.1 500 Internal Server Error');
-                }
-                exit();
-            }
-
-            $this->log('debug', 'Notification error: wrong payment status');
-            header('HTTP/1.1 401 Payment not exists');
             exit();
-        } else {
-            $this->log('debug', 'Check transaction for order#'.$order->order_id);
-            $transactionId = $this->getOrderModel()->getPaymentIdByOrderId($order->order_id);
-            if (empty($transactionId)) {
-                $this->log('debug', 'Payment id for order#'.$order->order_id.' not exists');
-
-                return array(3, 'Transaction not exists', '', 'Transaction not exists');
-            }
-            $payment = $this->getKassaPaymentMethod($pmConfigs)->fetchPayment($transactionId);
-            if ($payment === null) {
-                $this->log('debug', 'Payment for order#'.$order->order_id.' not exists');
-
-                return array(3, 'Transaction not exists', '', 'Transaction not exists');
-            }
-            if (!$payment->getPaid()) {
-                $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' not paid');
-                $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
-                $app         = JFactory::getApplication();
-                $app->redirect($redirectUrl);
-            } else {
-                $this->log('debug', 'Payment '.$payment->getId().' for order#'.$order->order_id.' paid');
-
-                return array(
-                    -1,
-                    sprintf(_JSHOP_YOO_PAYMENT_CAPTURED_TEXT, $transactionId),
-                    $transactionId,
-                    _JSHOP_YOO_PAYMENT_CAPTURED,
-                );
-            }
         }
+
+        $this->log('debug', 'Check transaction for order#'.$order->order_id);
+
+        if (!$this->checkPaymentByOrderId($order->order_id, $pmConfigs)) {
+            return array(3, 'Transaction not exists', '', 'Transaction not exists');
+        }
+        $transactionId = $this->getOrderModel()->getPaymentIdByOrderId($order->order_id);
+        if (empty($transactionId)) {
+            $this->log('debug', 'Payment id for order#'.$order->order_id.' not exists');
+
+            return array(3, 'Transaction not exists', '', 'Transaction not exists');
+        }
+
+        return array(
+            -1,
+            sprintf(_JSHOP_YOO_PAYMENT_CAPTURED_TEXT, $transactionId),
+            $transactionId,
+            _JSHOP_YOO_PAYMENT_CAPTURED,
+        );
+    }
+
+    /**
+     * @param $orderId
+     * @param $pmConfigs
+     * @return bool
+     */
+    private function checkPaymentByOrderId($orderId, $pmConfigs)
+    {
+        $paymentId = $this->getOrderModel()->getPaymentIdByOrderId($orderId);
+        if (empty($paymentId)) {
+            $this->log('debug', 'Redirect user to payment method page: payment id not exists');
+
+            return false;
+        }
+        $payment = $this->getKassaPaymentMethod($pmConfigs)->fetchPayment($paymentId);
+        if ($payment === null) {
+            $this->log('debug', 'Redirect user to payment method page: payment not exists');
+
+            return false;
+        }
+        if (!$payment->getPaid()) {
+            $this->log('debug', 'Redirect user to payment method page: payment not paid');
+            $redirectUrl = JRoute::_(JURI::root().'index.php?option=com_jshopping&controller=checkout&task=step3');
+            $app         = JFactory::getApplication();
+            $app->redirect($redirectUrl);
+
+            return false;
+        }
+
+        $this->log('debug', 'Payment '.$payment->getId().' for order#' . $orderId . ' paid');
+
+        return true;
     }
 
     /**
@@ -407,34 +364,12 @@ class pm_yoomoney_sbbol extends PaymentRoot
 
     public function log($level, $message, $context = array())
     {
-        $replace = array();
-
-        foreach ($context as $key => $value) {
-            if (is_scalar($value)) {
-                $replace['{'.$key.'}'] = $value;
-            } else {
-                $replace['{'.$key.'}'] = json_encode($value);
-            }
-        }
-
-        if (!empty($replace)) {
-            $message = strtr($message, $replace);
-        }
-
-        $fileName = $this->getLogFileName();
-        $fd       = @fopen($fileName, 'a');
-
-        if ($fd) {
-            flock($fd, LOCK_EX);
-            fwrite($fd, date(DATE_ATOM).' ['.$level.'] '.$message."\r\n");
-            flock($fd, LOCK_UN);
-            fclose($fd);
-        }
+        $this->logger->log($level, $message, $context);
     }
 
     private function getLogFileName()
     {
-        return realpath(JSH_DIR).'/log/pm_yoomoney.log';
+        return $this->logger->getLogFileName();
     }
 
     public function getKassaPaymentMethod($pmConfigs)
@@ -456,30 +391,9 @@ class pm_yoomoney_sbbol extends PaymentRoot
     {
         $uri         = JURI::getInstance();
         $redirectUrl = $uri->toString(array('scheme', 'host', 'port'))
-            .$this->getSefLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yoomoney_sbbol&no_lang=1&order_id=".$order->order_id);
+            .$this->versionHelper->getSefLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&js_paymentclass=pm_yoomoney_sbbol&no_lang=1&order_id=".$order->order_id);
         $redirectUrl = htmlspecialchars_decode($redirectUrl);
 
         return $redirectUrl;
-    }
-
-    public function saveOrderHistory($order, $comments)
-    {
-        $history                    = JSFactory::getTable('orderHistory', 'jshop');
-        $history->order_id          = $order->order_id;
-        $history->order_status_id   = $order->order_status;
-        $history->status_date_added = getJsDate();
-        $history->customer_notify   = 0;
-        $history->comments          = $comments;
-
-        return $history->store();
-    }
-
-    private function getSefLink($link)
-    {
-        if ($this->joomlaVersion == 4) {
-            return \JSHelper::SEFLink($link);
-        }
-
-        return SEFLink($link);
     }
 }

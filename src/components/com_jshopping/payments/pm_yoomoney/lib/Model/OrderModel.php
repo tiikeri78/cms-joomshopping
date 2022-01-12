@@ -45,6 +45,22 @@ class OrderModel
         return $record[0];
     }
 
+    public function getOrderIdByPaymentId($paymentId)
+    {
+        $query = $this->_db->getQuery(true);
+        $query->select('order_id')
+            ->from('#__yoomoney_payments')
+            ->where(
+                $this->_db->quoteName('payment_id') . ' = \'' . $paymentId . '\''
+            );
+        $this->_db->setQuery($query);
+        $record = $this->_db->loadRow();
+        if (empty($record)) {
+            return null;
+        }
+        return $record[0];
+    }
+
     /**
      * @param int $orderId
      * @param PaymentInterface $payment

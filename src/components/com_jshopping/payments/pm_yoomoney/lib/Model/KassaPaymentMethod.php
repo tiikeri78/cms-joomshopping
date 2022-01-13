@@ -44,7 +44,7 @@ class KassaPaymentMethod
     /**
      * KassaPaymentMethod constructor.
      *
-     * @param \pm_yoomoney $module
+     * @param \pm_yoomoney|\pm_yoomoney_sbbol $module
      * @param array $pmConfig
      */
     public function __construct($module, $pmConfig)

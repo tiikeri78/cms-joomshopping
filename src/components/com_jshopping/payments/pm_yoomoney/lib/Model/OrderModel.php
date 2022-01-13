@@ -31,12 +31,40 @@ class OrderModel
         }
     }
 
+    /**
+     * Возвращает payment id по id заказа
+     *
+     * @param $orderId
+     * @return null|string
+     */
     public function getPaymentIdByOrderId($orderId)
     {
         $query = $this->_db->getQuery(true);
         $query->select('payment_id')
             ->from('#__yoomoney_payments')
             ->where($this->_db->quoteName('order_id') . ' = ' . (int)$orderId);
+        $this->_db->setQuery($query);
+        $record = $this->_db->loadRow();
+        if (empty($record)) {
+            return null;
+        }
+        return $record[0];
+    }
+
+    /**
+     * Возвращает id заказа по payment id
+     *
+     * @param $paymentId
+     * @return null|string
+     */
+    public function getOrderIdByPaymentId($paymentId)
+    {
+        $query = $this->_db->getQuery(true);
+        $query->select('order_id')
+            ->from('#__yoomoney_payments')
+            ->where(
+                $this->_db->quoteName('payment_id') . ' = \'' . $paymentId . '\''
+            );
         $this->_db->setQuery($query);
         $record = $this->_db->loadRow();
         if (empty($record)) {

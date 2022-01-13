@@ -1,3 +1,9 @@
+### v2.3.1 от 13.01.2022
+* Добавлена обработка уведомлений от юкассы: PAYMENT_CANCELED, REFUND_SUCCEEDED, DEAL_CLOSED, PAYOUT_CANCELED,
+PAYOUT_SUCCEEDED.
+* Обноление SDK до версии 2.2.5
+* Рефакторинг
+
 ### v2.3.0 от 24.12.2021
 * Добавлена поддержка версий Joomla! 4.x и Joomshopping 5.x
 * Обновлен SDK до версии 2.2.4

@@ -16,14 +16,16 @@ echo JHtml::_('uitab.addTab', 'yamTab', 'money-tab', _JSHOP_YOO_TAB_MONEY);
         <p><?php echo _JSHOP_YOO_MONEY_HEAD; ?></p>
     </div>
     <div class="row mb-3">
-        <div class="col-sm-10 offset-sm-2">
+        <div class="col-3">
+            <label class="form-check-label" for="money">
+                <?php echo _JSHOP_YOO_MONEY_ON; ?>
+            </label>
+        </div>
+        <div class="col-3">
             <div class="form-check">
                 <input class="form-check-input pay-mode" type="checkbox" id="money" name="pm_params[moneymode]"
                        value="1"
                     <?= isSelected($params, 'moneymode') ? "checked" : ''; ?> >
-                <label class="form-check-label" for="money">
-                    <?php echo _JSHOP_YOO_MONEY_ON; ?>
-                </label>
             </div>
         </div>
     </div>

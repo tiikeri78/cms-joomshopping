@@ -40,16 +40,18 @@ echo JHtml::_('uitab.addTab', 'yamTab', 'kassa-tab', _JSHOP_YOO_TAB_KASSA);
     </div>
 <?php endif; ?>
     <div class="row mb-3">
-        <div class="col-sm-10 offset-sm-2">
+        <div class="col-3">
+            <label class="form-check-label" for="kassa">
+                <?php echo _JSHOP_YOO_KASSA_ON; ?>
+            </label>
+        </div>
+        <div class="col-3">
             <div class="form-check">
                 <input class="form-check-input pay-mode" type="checkbox" id="kassa" name="pm_params[kassamode]"
                        value="1"
                     <?php if (isSelected($params, 'kassamode')) {
                         echo "checked";
                     } ?> >
-                <label class="form-check-label" for="kassa">
-                    <?php echo _JSHOP_YOO_KASSA_ON; ?>
-                </label>
             </div>
         </div>
     </div>
@@ -172,10 +174,10 @@ echo JHtml::_('uitab.addTab', 'yamTab', 'kassa-tab', _JSHOP_YOO_TAB_KASSA);
                        value="1" id="yookassa_enable_hold_mode"
                     <?= $params['yookassa_enable_hold_mode'] == '1' ? "checked" : ''; ?>
                 >
-                <div  class="form-text"><?php echo _JSHOP_YOO_ENABLE_HOLD_MODE_HELP; ?></div>
             </div>
+            <div  class="form-text"><?php echo _JSHOP_YOO_ENABLE_HOLD_MODE_HELP; ?></div>
             <div id="yookassa_enable_hold_mode_extended_settings">
-                <div class="row mb-3">
+                <div class="row mt-3 mb-0">
                     <p><?php echo _JSHOP_YOO_HOLD_MODE_STATUSES; ?></p>
                 </div>
                 <div class="row mb-3">

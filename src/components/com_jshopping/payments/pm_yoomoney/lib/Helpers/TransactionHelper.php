@@ -4,8 +4,12 @@ namespace YooMoney\Helpers;
 
 use YooKassa\Model\NotificationEventType;
 use YooKassa\Model\PaymentStatus;
+use YooKassa\Model\Refund;
+use YooKassa\Model\RefundStatus;
 use YooKassa\Model\PaymentMethodType;
 use YooMoney\Model\KassaPaymentMethod;
+use YooMoney\Model\OrderModel;
+use Joomla\Component\Jshopping\Site\Table\OrderTable;
 
 /**
  * В классе объединены методы для обработки входящих уведомлений от Юkassa
@@ -35,20 +39,26 @@ class TransactionHelper
      */
     private $yooNotificationHelper;
 
+    /**
+     * @var OrderModel
+     */
+    private $orderModel;
+
     public function __construct()
     {
         $this->logger = new Logger();
         $this->yooNotificationHelper = new YoomoneyNotificationFactory();
         $this->orderHelper = new OrderHelper();
         $this->receiptHelper = new ReceiptHelper();
+        $this->orderModel = new OrderModel();
     }
 
     /**
      * Обрабатывает уведомление от Юkassa в зависимости от статуса платежа в уведомлении
      *
-     * @param $kassa
-     * @param $pmConfigs
-     * @param $order
+     * @param KassaPaymentMethod $kassa
+     * @param array $pmConfigs
+     * @param OrderTable $order
      * @return bool|void
      * @throws \Exception
      */
@@ -57,13 +67,22 @@ class TransactionHelper
         $notificationObj = $this->yooNotificationHelper->getNotificationObject();
         $paymentId = $notificationObj->getObject()->getId();
 
+        $refund = null;
         if ($notificationObj->getEvent() === NotificationEventType::REFUND_SUCCEEDED) {
-            $paymentId = $notificationObj->getObject()->getPaymentId();
+            $refundId = $notificationObj->getObject()->getId();
+            $refund = $kassa->fetchRefund($refundId);
+
+            if (!$refund) {
+                $this->logger->log('debug', 'Notification error: refund is not exist');
+                header('HTTP/1.1 404 Refund is not exist');
+                die();
+            }
+            $paymentId = $refund->getPaymentId();
         }
 
         $payment = $kassa->fetchPayment($paymentId);
         if (!$payment) {
-            $this->logger->log('debug', 'Notification error: payment not exist');
+            $this->logger->log('debug', 'Notification error: payment is not exist');
             header('HTTP/1.1 404 Payment not exists');
             die();
         }
@@ -106,9 +125,13 @@ class TransactionHelper
         if (
             $notificationObj->getEvent() === NotificationEventType::REFUND_SUCCEEDED
             && $payment->getStatus() === PaymentStatus::SUCCEEDED
+            && $refund->getStatus() == RefundStatus::SUCCEEDED
+            && !$this->isRefundAlreadyGot($refund->getId())
         ) {
-            $this->logger->log('info', 'Canceled payment ' . $payment->getId());
-            $this->processRefundNtfctn($order);
+            $this->logger->log(
+                'info', 'Refund payment ' . $payment->getId() . '. Refund ID ' . $refund->getId()
+            );
+            $this->processRefundNtfctn($order, $refund);
             return true;
         }
 
@@ -121,6 +144,23 @@ class TransactionHelper
         }
 
         return false;
+    }
+
+    /**
+     * Проверяет в БД было ли уже получено уведомление о возврате с таким id
+     *
+     * @param $refundId
+     * @return bool
+     */
+    private function isRefundAlreadyGot($refundId)
+    {
+        try {
+            $refund = $this->orderModel->getRefundById($refundId);
+        } catch (\Exception $e) {
+            $this->logger->log('debug', 'Failed to read a refund from DB: ' . $e->getMessage());
+        }
+
+        return !empty($refund);
     }
 
     /**
@@ -279,15 +319,39 @@ class TransactionHelper
      * Выполняет действия, если получено уведомление о статусе refund.succeeded
      *
      * @param $order
+     * @param Refund $refund
      */
-    private function processRefundNtfctn($order)
+    private function processRefundNtfctn($order, $refund)
     {
+        try {
+            $this->orderModel->insertRefund($order->getId(), $refund);
+        } catch (\Exception $e) {
+            $this->logger->log('debug', 'Failed to save a refund to DB: ' . $e->getMessage());
+
+            $this->logger->log('debug', 'Will create the refund table.');
+            try {
+                $tableChecker = new \YooMoney\Updater\Tables\TableChecker();
+                $tableChecker->checkYoomoneyRefunds();
+            } catch (\Exception $e) {
+                $this->logger->log('debug', 'Failure to create the refund table: ' . $e->getMessage());
+
+                return;
+            }
+
+            $this->orderModel->insertRefund($order->getId(), $refund);
+        }
+
         /** @var jshopCheckout $checkout */
-        $checkout             = \JSFactory::getModel('checkout', 'jshop');
+        $checkout = \JSFactory::getModel('checkout', 'jshop');
 
         $order->order_created = 1;
         $order->order_status  = self::REFUNDED_STATUS_ID;
         $order->store();
         $checkout->changeStatusOrder($order->order_id, self::REFUNDED_STATUS_ID, 0);
+        $this->orderHelper->saveOrderHistory(
+            $order,
+            sprintf(_JSHOP_YOO_KASSA_REFUND_SUCCEDED_ORDER_HISTORY,
+                $refund->getAmount()->getValue())
+        );
     }
 }

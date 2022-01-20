@@ -9,6 +9,7 @@ use YooKassa\Model\RefundStatus;
 use YooKassa\Model\PaymentMethodType;
 use YooMoney\Model\KassaPaymentMethod;
 use YooMoney\Model\OrderModel;
+use Joomla\Component\Jshopping\Site\Table\OrderTable;
 
 /**
  * В классе объединены методы для обработки входящих уведомлений от Юkassa
@@ -57,7 +58,7 @@ class TransactionHelper
      *
      * @param KassaPaymentMethod $kassa
      * @param array $pmConfigs
-     * @param $order
+     * @param OrderTable $order
      * @return bool|void
      * @throws \Exception
      */

@@ -73,7 +73,7 @@ class TransactionHelper
 
             if (!$refund) {
                 $this->logger->log('debug', 'Notification error: refund is not exist');
-                header('HTTP/1.1 404 Payment not exists');
+                header('HTTP/1.1 404 Refund is not exist');
                 die();
             }
             $paymentId = $refund->getPaymentId();

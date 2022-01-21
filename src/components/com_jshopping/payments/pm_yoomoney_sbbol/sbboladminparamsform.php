@@ -182,9 +182,7 @@ function escapeValue($value)
 <div class="clr"></div>
 <script type="text/javascript">
     window.addEventListener('DOMContentLoaded', function () {
-
         jQuery('.transaction-end-status').change(function () {
-            console.log(this.value)
             const endStatusInput = document.getElementById('transaction-end-status');
             endStatusInput.value = this.value;
         });

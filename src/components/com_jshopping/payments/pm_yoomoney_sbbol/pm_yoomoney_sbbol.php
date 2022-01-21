@@ -19,7 +19,7 @@ defined('_JEXEC') or die('Restricted access');
 
 define('JSH_DIR', realpath(dirname(__FILE__).'/../..'));
 define('DIR_DOWNLOAD', JSH_DIR.'/log');
-const _JSHOP_YOO_VERSION = '2.3.0';
+define('_JSHOP_YOO_VERSION', '2.3.0');
 
 require_once dirname(__FILE__) . '/../pm_yoomoney/lib/autoload.php';
 require_once dirname(__FILE__).'/SbbolException.php';

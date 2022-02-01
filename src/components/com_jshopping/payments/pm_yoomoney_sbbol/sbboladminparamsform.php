@@ -176,7 +176,15 @@ function escapeValue($value)
         </div>
 
         <input type="hidden" name="pm_params[transaction_end_status]" id="transaction-end-status"
-               value="<?php echo $params['transaction_end_status']; ?>"/>
+               value="<?php echo $params['kassa_transaction_end_status']; ?>"/>
     </fieldset>
 </div>
 <div class="clr"></div>
+<script type="text/javascript">
+    window.addEventListener('DOMContentLoaded', function () {
+        jQuery('.transaction-end-status').change(function () {
+            const endStatusInput = document.getElementById('transaction-end-status');
+            endStatusInput.value = this.value;
+        });
+    });
+</script>

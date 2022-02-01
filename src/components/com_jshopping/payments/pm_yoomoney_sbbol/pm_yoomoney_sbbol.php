@@ -7,6 +7,8 @@
  * @copyright Copyright (C) 2020 YooMoney. All rights reserved.
  */
 
+use YooKassa\Model\Notification\AbstractNotification;
+use YooMoney\Helpers\YoomoneyNotificationFactory;
 use YooMoney\Model\KassaPaymentMethod;
 use YooMoney\Model\SbbolException;
 use YooMoney\Helpers\Logger;
@@ -17,6 +19,7 @@ defined('_JEXEC') or die('Restricted access');
 
 define('JSH_DIR', realpath(dirname(__FILE__).'/../..'));
 define('DIR_DOWNLOAD', JSH_DIR.'/log');
+define('_JSHOP_YOO_VERSION', '2.3.0');
 
 require_once dirname(__FILE__) . '/../pm_yoomoney/lib/autoload.php';
 require_once dirname(__FILE__).'/SbbolException.php';
@@ -41,11 +44,17 @@ class pm_yoomoney_sbbol extends PaymentRoot
      */
     private $versionHelper;
 
+    /**
+     * @var YoomoneyNotificationFactory
+     */
+    private $yooNotificationHelper;
+
     public function __construct()
     {
         $this->versionHelper = new JVersionDependenciesHelper();
         $this->logger = new Logger();
         $this->transactionHelper = new TransactionHelper();
+        $this->yooNotificationHelper = new YoomoneyNotificationFactory();
     }
 
     function showPaymentForm($params, $pmconfigs)
@@ -256,6 +265,26 @@ class pm_yoomoney_sbbol extends PaymentRoot
             "checkHash" => 0,
         );
 
+        if (isset($_GET['act']) && $_GET['act'] === 'notify') {
+            $this->log('debug', 'Notification callback check URL parameters');
+
+            try {
+                $notification = $this->yooNotificationHelper->getNotificationObject();
+                $orderId = $this->getOrderIdByNotification($notification);
+            } catch (Exception $e) {
+                $this->log('debug', 'Notification error: '.$e->getMessage());
+                header('HTTP/1.1 400 Invalid body');
+                die();
+            }
+            $params['order_id']          = $orderId;
+            $params['hash']              = "";
+            $params['checkHash']         = 0;
+            $params['checkReturnParams'] = 1;
+            $this->log('debug', 'Notify url params is: '.json_encode($params));
+
+            return $params;
+        }
+
         if ($_POST['orderNumber']) {
             $params['order_id'] = (int)$_POST['module_order_id'];
         } else {
@@ -263,6 +292,31 @@ class pm_yoomoney_sbbol extends PaymentRoot
         }
 
         return $params;
+    }
+
+    /**
+     * Возвращает id заказа по значению metadata.order_id в уведомлении, или, если уведомление о статусе
+     * refund.succeeded, то вызывает метод поиска refund.succeeded в БД по id платежа
+     *
+     * @param AbstractNotification $notification
+     * @return string
+     * @throws Exception
+     */
+    private function getOrderIdByNotification($notification)
+    {
+        $object = $notification->getObject();
+        if (method_exists($object, 'getMetadata')) {
+            $meta = $object->getMetadata();
+            $orderId = $meta['order_id'];
+        } else {
+            $orderId = $this->getOrderModel()->getOrderIdByPaymentId($object->getPaymentId());
+        }
+
+        if (empty($orderId)) {
+            throw new \Exception('Notification error: order_id was not found');
+        }
+
+        return $orderId;
     }
 
     /**

@@ -70,6 +70,7 @@ class pm_yoomoney extends PaymentRoot
     private static $disabledPaymentMethods = array(
         PaymentMethodType::B2B_SBERBANK,
         PaymentMethodType::WECHAT,
+        PaymentMethodType::WEBMONEY,
     );
 
     private static $customPaymentMethods = array(
